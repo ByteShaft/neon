@@ -14,21 +14,25 @@ public class MainActivity extends Activity  {
 
     Switch switcher;
     Camera camera;
+    Camera.Parameters params;
     Flashlight flashlight;
+    Helpers helpers;
+    RelativeLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        camera = Camera.open();
-        flashlight = new Flashlight(camera);
+        initializeClasses();
 
-        final RelativeLayout layout = (RelativeLayout) findViewById(R.id.mainLayout);
+        if(!helpers.isFlashlightAvailable(this)) {
+            helpers.showErrorDialog(this);
+        }
 
+        layout = (RelativeLayout) findViewById(R.id.mainLayout);
         switcher = (Switch) findViewById(R.id.switcher);
         switcher.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,5 +46,13 @@ public class MainActivity extends Activity  {
                 }
             }
         });
+    }
+
+    private void initializeClasses() {
+        camera = Camera.open();
+        params = camera.getParameters();
+        flashlight = new Flashlight(camera, params);
+        helpers = new Helpers();
+
     }
 }

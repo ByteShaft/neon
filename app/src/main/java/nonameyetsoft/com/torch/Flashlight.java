@@ -8,24 +8,20 @@ public class Flashlight {
     private boolean flashRunning = false;
 
     private Camera camera;
-    private Camera.Parameters param;
+    private Camera.Parameters params;
 
     public void turnOnFlash() {
-        param.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(param);
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(params);
         camera.startPreview();
         flashRunning = true;
     }
 
     public void turnOffFlash() {
-        param.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-        camera.setParameters(param);
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(params);
         camera.stopPreview();
         flashRunning = false;
-    }
-
-    private void initialize() {
-        param = camera.getParameters();
     }
 
     public boolean isFlashOn() {
@@ -36,8 +32,8 @@ public class Flashlight {
         }
     }
 
-    public Flashlight(Camera camera) {
+    public Flashlight(Camera camera, Camera.Parameters params) {
         this.camera = camera;
-        initialize();
+        this.params = params;
     }
 }
