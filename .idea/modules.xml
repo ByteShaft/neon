@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Torch.iml" filepath="$PROJECT_DIR$/Torch.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/torch.iml" filepath="$PROJECT_DIR$/torch.iml" />
     </modules>
   </component>
 </project>
