@@ -1,58 +1,55 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.RelativeLayout;
-import android.widget.Switch;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
+import nonameyetsoft.com.torch.R;
 
-public class MainActivity extends Activity  {
+public class MainActivity extends Activity {
 
-    Switch switcher;
-    Camera camera;
-    Camera.Parameters params;
-    Flashlight flashlight;
-    Helpers helpers;
-    RelativeLayout layout;
+    private boolean isLighOn = false;
+    public Camera camera;
+    private Parameters p;
+    private Button button;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
+    public void initializeCamera() {
+        camera = Camera.open();
+        p = camera.getParameters();
+    }
 
-        initializeClasses();
+    public void setListener() {
+        initializeCamera();
+        button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new OnClickListener() {
 
-        if(!helpers.isFlashlightAvailable(this)) {
-            helpers.showErrorDialog(this);
-        }
-
-        layout = (RelativeLayout) findViewById(R.id.mainLayout);
-        switcher = (Switch) findViewById(R.id.switcher);
-        switcher.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (!flashlight.isFlashOn()) {
-                    flashlight.turnOnFlash();
-                    layout.setBackgroundColor(Color.WHITE);
+            public void onClick(View arg0) {
+
+                if (isLighOn) {
+                    p.setFlashMode(Parameters.FLASH_MODE_OFF);
+                    camera.setParameters(p);
+                    camera.stopPreview();
+                    isLighOn = false;
+
                 } else {
-                    flashlight.turnOffFlash();
-                    layout.setBackgroundColor(Color.BLACK);
+                    p.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                    camera.setParameters(p);
+                    camera.startPreview();
+                    isLighOn = true;
                 }
             }
         });
     }
 
-    private void initializeClasses() {
-        camera = Camera.open();
-        params = camera.getParameters();
-        flashlight = new Flashlight(camera, params);
-        helpers = new Helpers();
-
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setListener();
     }
 }
