@@ -20,12 +20,28 @@ public class MainActivity extends Activity  {
     DatabaseSP dataOnClick;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onStop() {
+        super.onStop();
+
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (camera == null) {
+            initializeClasses();
+        }
+    }
+
+    public void setListener() {
+        initializeClasses();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        initializeClasses();
         if(!helpers.isFlashlightAvailable(this)) {
             helpers.showErrorDialog(this);
         }
@@ -44,6 +60,14 @@ public class MainActivity extends Activity  {
                 }
             }
         });
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setListener();
     }
     private void initializeClasses() {
         camera = Camera.open();
