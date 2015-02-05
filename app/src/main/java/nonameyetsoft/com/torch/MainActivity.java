@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
-public class MainActivity extends Activity implements View.OnClickListener  {
+
+public class MainActivity extends Activity implements CompoundButton.OnCheckedChangeListener {
 
     Switch switcher;
     Camera camera;
@@ -31,7 +32,7 @@ public class MainActivity extends Activity implements View.OnClickListener  {
         initializeClasses();
         initializeXmlReferences();
         helpers.showErrorDialogIfFlashlightNotAvailable(MainActivity.this);
-        switcher.setOnClickListener(this);
+        switcher.setOnCheckedChangeListener(this);
     }
 
     @Override
@@ -52,21 +53,6 @@ public class MainActivity extends Activity implements View.OnClickListener  {
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        switch(view.getId()) {
-            case R.id.switcher:
-                if (!flashlight.isFlashOn()) {
-                    flashlight.turnOnFlash();
-                    layout.setBackgroundColor(Color.WHITE);
-                    dataOnClick.addOneToDatabase(MainActivity.this);
-                } else {
-                    flashlight.turnOffFlash();
-                    layout.setBackgroundColor(Color.BLACK);
-                }
-        }
-    }
-
     private void initializeClasses() {
         camera = Camera.open();
         params = camera.getParameters();
@@ -78,5 +64,21 @@ public class MainActivity extends Activity implements View.OnClickListener  {
     private void initializeXmlReferences() {
         layout = (RelativeLayout) findViewById(R.id.mainLayout);
         switcher = (Switch) findViewById(R.id.switcher);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch(buttonView.getId()) {
+            case R.id.switcher:
+                if (!flashlight.isFlashOn() && isChecked) {
+                    flashlight.turnOnFlash();
+                    layout.setBackgroundColor(Color.WHITE);
+                    dataOnClick.addOneToDatabase(MainActivity.this);
+                } else {
+                    flashlight.turnOffFlash();
+                    layout.setBackgroundColor(Color.BLACK);
+                }
+        }
+
     }
 }
