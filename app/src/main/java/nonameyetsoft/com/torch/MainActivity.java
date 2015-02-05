@@ -9,7 +9,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
-public class MainActivity extends Activity  {
+public class MainActivity extends Activity implements View.OnClickListener  {
 
     Switch switcher;
     Camera camera;
@@ -18,6 +18,21 @@ public class MainActivity extends Activity  {
     Helpers helpers;
     RelativeLayout layout;
     DatabaseSP dataOnClick;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
+        setContentView(R.layout.activity_main);
+
+        initializeClasses();
+        initializeXmlReferences();
+        helpers.showErrorDialogIfFlashlightNotAvailable(MainActivity.this);
+        switcher.setOnClickListener(this);
+    }
 
     @Override
     protected void onStop() {
@@ -37,19 +52,10 @@ public class MainActivity extends Activity  {
         }
     }
 
-    public void setListener() {
-        initializeClasses();
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
-        if(!helpers.isFlashlightAvailable(this)) {
-            helpers.showErrorDialog(this);
-        }
-        layout = (RelativeLayout) findViewById(R.id.mainLayout);
-        switcher = (Switch) findViewById(R.id.switcher);
-        switcher.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()) {
+            case R.id.switcher:
                 if (!flashlight.isFlashOn()) {
                     flashlight.turnOnFlash();
                     layout.setBackgroundColor(Color.WHITE);
@@ -58,22 +64,19 @@ public class MainActivity extends Activity  {
                     flashlight.turnOffFlash();
                     layout.setBackgroundColor(Color.BLACK);
                 }
-            }
-        });
+        }
     }
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setListener();
-    }
     private void initializeClasses() {
         camera = Camera.open();
         params = camera.getParameters();
         flashlight = new Flashlight(camera, params);
         helpers = new Helpers();
         dataOnClick = new DatabaseSP();
+    }
+
+    private void initializeXmlReferences() {
+        layout = (RelativeLayout) findViewById(R.id.mainLayout);
+        switcher = (Switch) findViewById(R.id.switcher);
     }
 }
