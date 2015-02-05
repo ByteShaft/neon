@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
             camera = null;
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -51,19 +52,6 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
         if (camera == null) {
             initializeClasses();
         }
-    }
-
-    private void initializeClasses() {
-        camera = Camera.open();
-        params = camera.getParameters();
-        flashlight = new Flashlight(camera, params);
-        helpers = new Helpers();
-        dataOnClick = new DatabaseSP();
-    }
-
-    private void initializeXmlReferences() {
-        layout = (RelativeLayout) findViewById(R.id.mainLayout);
-        switcher = (Switch) findViewById(R.id.switcher);
     }
 
     @Override
@@ -79,6 +67,18 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
                     layout.setBackgroundColor(Color.BLACK);
                 }
         }
+    }
 
+    private void initializeClasses() {
+        camera = Camera.open();
+        params = camera.getParameters();
+        flashlight = new Flashlight(camera, params);
+        helpers = new Helpers();
+        dataOnClick = new DatabaseSP();
+    }
+    
+    private void initializeXmlReferences() {
+        layout = (RelativeLayout) findViewById(R.id.mainLayout);
+        switcher = (Switch) findViewById(R.id.switcher);
     }
 }
