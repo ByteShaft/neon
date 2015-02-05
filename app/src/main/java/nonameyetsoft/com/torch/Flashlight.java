@@ -34,7 +34,7 @@ public class Flashlight {
         }
     }
 
-    public void startBlinking(final int blinkPeriod) {
+    public void startBlinking(int blinkPeriod) {
         createBlinkerThread(blinkPeriod);
         blinker.start();
     }
@@ -48,7 +48,7 @@ public class Flashlight {
             @Override
             public void run() {
                 try {
-                    while(blinker != null ) {
+                    while(blinker != null) {
                         turnOnFlash();
                         sleep(blinkPeriod);
                         turnOffFlash();
