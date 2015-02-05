@@ -37,7 +37,7 @@ public class MainActivity extends Activity  {
                 if (!flashlight.isFlashOn()) {
                     flashlight.turnOnFlash();
                     layout.setBackgroundColor(Color.WHITE);
-                    dataOnClick.onClickAddOne(MainActivity.this);
+                    dataOnClick.addOneToDatabase(MainActivity.this);
                 } else {
                     flashlight.turnOffFlash();
                     layout.setBackgroundColor(Color.BLACK);
