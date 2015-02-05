@@ -9,7 +9,6 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
-
 public class MainActivity extends Activity  {
 
     Switch switcher;
@@ -18,6 +17,7 @@ public class MainActivity extends Activity  {
     Flashlight flashlight;
     Helpers helpers;
     RelativeLayout layout;
+    DatabaseSP dataOnClick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,13 +25,10 @@ public class MainActivity extends Activity  {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-
         initializeClasses();
-
         if(!helpers.isFlashlightAvailable(this)) {
             helpers.showErrorDialog(this);
         }
-
         layout = (RelativeLayout) findViewById(R.id.mainLayout);
         switcher = (Switch) findViewById(R.id.switcher);
         switcher.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +37,7 @@ public class MainActivity extends Activity  {
                 if (!flashlight.isFlashOn()) {
                     flashlight.turnOnFlash();
                     layout.setBackgroundColor(Color.WHITE);
+                    dataOnClick.addOneToDatabase(MainActivity.this);
                 } else {
                     flashlight.turnOffFlash();
                     layout.setBackgroundColor(Color.BLACK);
@@ -47,12 +45,11 @@ public class MainActivity extends Activity  {
             }
         });
     }
-
     private void initializeClasses() {
         camera = Camera.open();
         params = camera.getParameters();
         flashlight = new Flashlight(camera, params);
         helpers = new Helpers();
-
+        dataOnClick = new DatabaseSP();
     }
 }
