@@ -3,22 +3,46 @@ package nonameyetsoft.com.torch;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 
 public class Helpers {
 
-    public void showErrorDialogIfFlashlightNotAvailable(Activity context) {
-        if(!isFlashlightAvailable(context)) {
-            showErrorDialog(context);
+    private Activity context;
+
+    public Helpers(Activity context) {
+        this.context = context;
+    }
+
+    public void checkFlashlightAvailability() {
+        if(!Flashlight.isAvailable(context)) {
+            showFlashlightNotAvailableDialog();
         }
     }
 
-    public void showFlashlightBusyErrorDialog(final Activity context) {
+    public void showFlashlightBusyDialog() {
+        String title = "Resource Busy";
+        String description = "Camera Resource already in use.";
+        String buttonText = "Ok";
+
+        AlertDialog alertDialog = buildErrorDialog(title, description, buttonText);
+        alertDialog.show();
+    }
+
+    private void showFlashlightNotAvailableDialog() {
+        String title = "Flashlight not detected.";
+        String description = "Your device does not seem to have a flashlight.";
+        String buttonText = "Ok";
+
+        AlertDialog alertDialog = buildErrorDialog(title, description, buttonText);
+        alertDialog.show();
+    }
+
+    private AlertDialog buildErrorDialog(String title, String description, String buttonText) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Resource Busy");
-        builder.setMessage("Camera Resource already in use.");
+        builder.setTitle(title);
+        builder.setMessage(description);
         builder.setCancelable(false);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -26,31 +50,6 @@ public class Helpers {
             }
         });
 
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private boolean isFlashlightAvailable(Activity context) {
-        boolean availability;
-        PackageManager packageManager = context.getPackageManager();
-        availability = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-
-        return availability;
-    }
-
-    private void showErrorDialog(final Activity context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Flashlight not detected.");
-        builder.setMessage("Your device does not seem to have a flashlight.");
-        builder.setCancelable(false);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                context.finish();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        return builder.create();
     }
 }
