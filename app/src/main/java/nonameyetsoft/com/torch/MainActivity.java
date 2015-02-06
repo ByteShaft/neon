@@ -18,7 +18,6 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
     Flashlight flashlight;
     Helpers helpers;
     RelativeLayout layout;
-    DatabaseSP dataOnClick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,6 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
                 if (!flashlight.isFlashOn() && isChecked) {
                     flashlight.turnOnFlash();
                     layout.setBackgroundColor(Color.WHITE);
-                    dataOnClick.addOneToDatabase(MainActivity.this);
                 } else {
                     flashlight.turnOffFlash();
                     layout.setBackgroundColor(Color.BLACK);
@@ -74,7 +72,6 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
         params = camera.getParameters();
         flashlight = new Flashlight(camera, params);
         helpers = new Helpers();
-        dataOnClick = new DatabaseSP();
     }
     
     private void initializeXmlReferences() {
