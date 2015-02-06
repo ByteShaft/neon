@@ -1,19 +1,18 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
+import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 
 
-public class MainActivity extends Activity implements CompoundButton.OnCheckedChangeListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-    Switch switcher;
+    Button switcher;
     Camera camera;
     Camera.Parameters params;
     Flashlight flashlight;
@@ -32,7 +31,7 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
         initializeClasses();
         initializeXmlReferences();
         helpers.showErrorDialogIfFlashlightNotAvailable(MainActivity.this);
-        switcher.setOnCheckedChangeListener(this);
+        switcher.setOnClickListener(this);
     }
 
     @Override
@@ -55,15 +54,15 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch(buttonView.getId()) {
+    public void onClick(View view) {
+        switch(view.getId()) {
             case R.id.switcher:
-                if (!flashlight.isFlashOn() && isChecked) {
+                if (!flashlight.isFlashOn()) {
                     flashlight.turnOnFlash();
-                    layout.setBackgroundColor(Color.WHITE);
+                    switcher.setBackgroundResource(R.drawable.button_off);
                 } else {
                     flashlight.turnOffFlash();
-                    layout.setBackgroundColor(Color.BLACK);
+                    switcher.setBackgroundResource(R.drawable.button_on);
                 }
         }
     }
@@ -81,7 +80,6 @@ public class MainActivity extends Activity implements CompoundButton.OnCheckedCh
     }
     
     private void initializeXmlReferences() {
-        layout = (RelativeLayout) findViewById(R.id.mainLayout);
-        switcher = (Switch) findViewById(R.id.switcher);
+        switcher = (Button) findViewById(R.id.switcher);
     }
 }
