@@ -1,15 +1,13 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -70,10 +68,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initializeClasses() {
-        camera = Camera.open();
-        params = camera.getParameters();
-        flashlight = new Flashlight(camera, params);
         helpers = new Helpers();
+        try {
+            camera = Camera.open();
+            params = camera.getParameters();
+            flashlight = new Flashlight(camera, params);
+        } catch(RuntimeException e) {
+            Log.e("FLASH_LIGHT", "Flashlight resource busy.");
+            helpers.showFlashlightBusyErrorDialog(MainActivity.this);
+        }
     }
     
     private void initializeXmlReferences() {
