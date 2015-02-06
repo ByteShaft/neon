@@ -7,7 +7,7 @@ import android.hardware.Camera;
 
 public class Flashlight {
 
-    private boolean flashRunning = false;
+    public static boolean running = false;
     private Camera camera;
     private Camera.Parameters params;
 
@@ -16,14 +16,14 @@ public class Flashlight {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
         camera.setParameters(params);
         camera.startPreview();
-        flashRunning = true;
+        running = true;
     }
 
     public void turnOff() {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         camera.setParameters(params);
         camera.stopPreview();
-        flashRunning = false;
+        running = false;
     }
 
     public static boolean isAvailable(Context context) {
@@ -35,7 +35,7 @@ public class Flashlight {
     }
 
     public boolean isOn() {
-        return flashRunning;
+        return running;
     }
 
     public Flashlight(Camera camera, Camera.Parameters params) {
