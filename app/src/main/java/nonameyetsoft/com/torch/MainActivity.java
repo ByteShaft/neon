@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -17,7 +16,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     Camera.Parameters params;
     Flashlight flashlight;
     Helpers helpers;
-    RelativeLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +33,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if(flashlight.isFlashOn()) {
+            flashlight.turnOffFlash();
+        }
+        camera.release();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
-
-        if (camera != null) {
+        if(!flashlight.isFlashOn()) {
             camera.release();
             camera = null;
         }
