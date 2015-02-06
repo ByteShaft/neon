@@ -43,6 +43,7 @@ public class Helpers {
         builder.setMessage(description);
         builder.setCancelable(false);
         builder.setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

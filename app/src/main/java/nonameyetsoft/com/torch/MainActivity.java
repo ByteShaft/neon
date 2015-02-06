@@ -11,6 +11,7 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
+    private boolean flashBusy = false;
     Button switcher;
     Camera camera;
     Camera.Parameters params;
@@ -36,24 +37,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if(flashlight.isOn()) {
             flashlight.turnOff();
         }
-        camera.release();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initializeCamera();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(!flashlight.isOn()) {
-            camera.release();
+        if(!Flashlight.running && flashBusy) {
             camera = null;
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (camera == null) {
-            initializeClasses();
+        } else if(!Flashlight.running) {
+            destroyCamera();
         }
     }
 
@@ -78,16 +76,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
         );
     }
 
+    private void initializeCamera() {
+        if(camera == null) {
+            try {
+                camera = Camera.open();
+                params = camera.getParameters();
+                flashlight = new Flashlight(camera, params);
+            } catch(RuntimeException e) {
+                Log.e("FLASHLIGHT", "Resource busy.");
+                helpers.showFlashlightBusyDialog();
+                flashBusy = true;
+            }
+        }
+    }
+
+    private void destroyCamera() {
+        camera.release();
+        camera = null;
+    }
+
     private void initializeClasses() {
         helpers = new Helpers(MainActivity.this);
-        try {
-            camera = Camera.open();
-            params = camera.getParameters();
-            flashlight = new Flashlight(camera, params);
-        } catch(RuntimeException e) {
-            Log.e("FLASHLIGHT", "Resource busy.");
-            helpers.showFlashlightBusyDialog();
-        }
     }
     
     private void initializeXmlReferences() {
