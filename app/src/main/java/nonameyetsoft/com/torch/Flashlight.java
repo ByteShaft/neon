@@ -1,35 +1,41 @@
 package nonameyetsoft.com.torch;
 
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 
 public class Flashlight {
 
     private boolean flashRunning = false;
-
     private Camera camera;
     private Camera.Parameters params;
 
-    public void turnOnFlash() {
+
+    public void turnOn() {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
         camera.setParameters(params);
         camera.startPreview();
         flashRunning = true;
     }
 
-    public void turnOffFlash() {
+    public void turnOff() {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         camera.setParameters(params);
         camera.stopPreview();
         flashRunning = false;
     }
 
-    public boolean isFlashOn() {
-        if(flashRunning) {
-            return true;
-        } else {
-            return false;
-        }
+    public static boolean isAvailable(Context context) {
+        boolean availability;
+        PackageManager packageManager = context.getPackageManager();
+        availability = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+
+        return availability;
+    }
+
+    public boolean isOn() {
+        return flashRunning;
     }
 
     public Flashlight(Camera camera, Camera.Parameters params) {
