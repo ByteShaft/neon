@@ -10,7 +10,6 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private boolean flashBusy = false;
     Button switcher;
     Camera camera;
     Camera.Parameters params;
@@ -46,9 +45,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-        if(!Flashlight.running && flashBusy) {
+        if(!flashlight.isOn() && Flashlight.isBusy) {
             camera = null;
-        } else if(!Flashlight.running) {
+        } else if(!flashlight.isOn()) {
             destroyCamera();
         }
     }
@@ -76,7 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             } catch(RuntimeException e) {
                 Log.e("FLASHLIGHT", "Resource busy.");
                 helpers.showFlashlightBusyDialog();
-                flashBusy = true;
+                Flashlight.isBusy = true;
             }
         }
     }
@@ -86,11 +85,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         camera = null;
     }
 
-    private void initializeClasses() {
-        helpers = new Helpers(MainActivity.this);
-    }
+    private void initializeClasses() { helpers = new Helpers(MainActivity.this); }
     
-    private void initializeXmlReferences() {
-        switcher = (Button) findViewById(R.id.switcher);
-    }
+    private void initializeXmlReferences() { switcher = (Button) findViewById(R.id.switcher); }
 }
