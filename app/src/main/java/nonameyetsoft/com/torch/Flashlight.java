@@ -4,12 +4,14 @@ package nonameyetsoft.com.torch;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.util.Log;
 
 public class Flashlight {
 
     public static boolean running = false;
     private Camera camera;
     private Camera.Parameters params;
+    private Thread blinker;
 
 
     public void turnOn() {
@@ -36,6 +38,33 @@ public class Flashlight {
 
     public boolean isOn() {
         return running;
+    }
+
+    public void startBlinking(int blinkPeriod) {
+        createBlinkerThread(blinkPeriod);
+        blinker.start();
+    }
+
+    public void stopBlinking() {
+        blinker = null;
+    }
+
+    private void createBlinkerThread(final int blinkPeriod) {
+        blinker = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while(blinker != null) {
+                        turnOnFlash();
+                        sleep(blinkPeriod);
+                        turnOffFlash();
+                        sleep(blinkPeriod);
+                    }
+                } catch(InterruptedException e) {
+                    Log.e("FLASH_BLINKER", "Blinking thread was interrupted.");
+                }
+            }
+        };
     }
 
     public Flashlight(Camera camera, Camera.Parameters params) {
