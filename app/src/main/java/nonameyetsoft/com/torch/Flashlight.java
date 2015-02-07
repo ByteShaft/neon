@@ -13,9 +13,9 @@ public class Flashlight {
 
 
     public void turnOn() {
+        camera.startPreview();
         params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
         camera.setParameters(params);
-        camera.startPreview();
         running = true;
     }
 
