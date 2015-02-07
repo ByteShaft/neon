@@ -3,7 +3,10 @@ package nonameyetsoft.com.torch;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+
+import java.io.IOException;
 
 public class Flashlight {
 
@@ -13,6 +16,7 @@ public class Flashlight {
 
 
     public void turnOn() {
+        setVideoText();
         camera.startPreview();
         params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
         camera.setParameters(params);
@@ -36,6 +40,17 @@ public class Flashlight {
 
     public boolean isOn() {
         return running;
+    }
+
+    private void setVideoText() {
+        // Flashlight does not work on many devices unless
+        // surfaceTexture is set.
+        SurfaceTexture mSurfaceTexture = new SurfaceTexture(0);
+        try {
+            camera.setPreviewTexture(mSurfaceTexture);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Flashlight(Camera camera, Camera.Parameters params) {
