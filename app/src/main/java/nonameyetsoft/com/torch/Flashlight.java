@@ -1,26 +1,34 @@
 package nonameyetsoft.com.torch;
 
-
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.os.Build;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Flashlight {
 
+    private String[] whiteListedDevices = {"dlx", "mako", "ghost"};
     public static boolean running = false;
+
     private Camera camera;
     private Camera.Parameters params;
 
 
     public void turnOn() {
-        setVideoText();
-        camera.startPreview();
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(params);
-        running = true;
+        if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
+            setCameraPreviewWithTorchOn();
+        }
+        else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
+            setCameraPreviewWithTorchOn();
+        } else {
+            setVideoText();
+            setCameraPreviewWithTorchOn();
+        }
     }
 
     public void turnOff() {
@@ -42,6 +50,7 @@ public class Flashlight {
         return running;
     }
 
+    @TargetApi(11)
     private void setVideoText() {
         // Flashlight does not work on many devices unless
         // surfaceTexture is set.
@@ -51,6 +60,13 @@ public class Flashlight {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setCameraPreviewWithTorchOn() {
+        camera.startPreview();
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(params);
+        running = true;
     }
 
     public Flashlight(Camera camera, Camera.Parameters params) {
