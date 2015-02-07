@@ -5,7 +5,6 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 
 
@@ -21,7 +20,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setAppWindowFullScreen();
         setContentView(R.layout.activity_main);
 
         initializeClasses();
@@ -67,13 +65,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     switcher.setBackgroundResource(R.drawable.button_on);
                 }
         }
-    }
-
-    private void setAppWindowFullScreen() {
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-        );
     }
 
     private void initializeCamera() {
