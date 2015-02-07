@@ -1,7 +1,6 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,11 +45,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(!flashlight.isOn() && Flashlight.isBusy) {
             camera = null;
-        } else if(!flashlight.isOn()) {
+        } else if(!flashlight.isOn() && camera != null) {
             destroyCamera();
         }
     }

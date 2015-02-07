@@ -1,7 +1,6 @@
 package nonameyetsoft.com.torch;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
