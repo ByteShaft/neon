@@ -1,6 +1,7 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,22 +16,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
     Camera.Parameters params;
     Flashlight flashlight;
     Helpers helpers;
+   // NotificationFeature notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initializeClasses();
         initializeXmlReferences();
         helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
+//        importNotification();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
+        // notification remove when backPressed...and App closed.
+       // notification.notificationManager.cancel(446);
         if(flashlight.isOn()) {
             flashlight.turnOff();
         }
@@ -58,10 +61,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.switcher:
                 if (!flashlight.isOn()) {
                     flashlight.turnOn();
+                   // notification.notifyMe();
                     switcher.setBackgroundResource(R.drawable.button_off);
+
                 } else {
                     flashlight.turnOff();
                     switcher.setBackgroundResource(R.drawable.button_on);
+                    // notification disappear when flashlight off..
+
+//                    notification.notificationManager.cancel(446);
                 }
         }
     }
@@ -84,6 +92,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         camera.release();
         camera = null;
     }
+
+//    public void importNotification() { notification = new NotificationFeature(MainActivity.this);}
 
     private void initializeClasses() { helpers = new Helpers(MainActivity.this); }
     
