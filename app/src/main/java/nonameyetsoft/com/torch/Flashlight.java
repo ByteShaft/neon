@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class Flashlight {
 
-    private String[] whiteListedDevices = {"dlx", "mako", "ghost"};
+    private String[] whiteListedDevices = {"dlx", "mako", "ghost", "maguro"};
     private boolean isRunning = false;
     public static boolean isBusy = false;
 
