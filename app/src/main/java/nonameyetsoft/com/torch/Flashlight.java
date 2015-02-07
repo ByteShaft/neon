@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class Flashlight {
 
-    private String[] whiteListedDevices = {"dlx", "mako", "ghost"};
+    private String[] whiteListedDevices = {"dlx", "mako", "ghost", "g2"};
     private boolean isRunning = false;
     public static boolean isBusy = false;
 
@@ -35,11 +35,18 @@ public class Flashlight {
     public boolean isOn() { return isRunning; }
 
     public void turnOn() {
+        // We have a list of "known-to-work" devices where we don't
+        // need any videoTexture hacks.
         if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
             setCameraPreviewWithTorchOn();
         }
+        // We don't "officially" support gingerbread devices but we don't
+        // want them to be left off, so we implemented this code as a gamble
+        // for such devices.
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
             setCameraPreviewWithTorchOn();
+            // For all other devices, start videoTexture before attempting to
+            // enable flash. <Known to be a bit slow>.
         } else {
             setVideoTexture();
             setCameraPreviewWithTorchOn();
