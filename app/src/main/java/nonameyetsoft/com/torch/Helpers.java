@@ -19,18 +19,18 @@ public class Helpers {
     }
 
     public void showFlashlightBusyDialog() {
-        String title = "Resource Busy";
-        String description = "Camera Resource already in use.";
-        String buttonText = "Ok";
+        String title = context.getString(R.string.dialog_title_resource_busy);
+        String description = context.getString(R.string.dialog_description_resource_busy);
+        String buttonText = context.getString(R.string.dialog_ok);
 
         AlertDialog alertDialog = buildErrorDialog(title, description, buttonText);
         alertDialog.show();
     }
 
     private void showFlashlightNotAvailableDialog() {
-        String title = "Flashlight not detected.";
-        String description = "Your device does not seem to have a flashlight.";
-        String buttonText = "Ok";
+        String title = context.getString(R.string.dialog_title_flashlight_not_available);
+        String description = context.getString(R.string.dialog_description_flash_not_available);
+        String buttonText = context.getString(R.string.dialog_ok);
 
         AlertDialog alertDialog = buildErrorDialog(title, description, buttonText);
         alertDialog.show();

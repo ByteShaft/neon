@@ -6,12 +6,11 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
-    private boolean flashBusy = false;
+
     Button switcher;
     Camera camera;
     Camera.Parameters params;
@@ -22,7 +21,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setAppWindowFullScreen();
         setContentView(R.layout.activity_main);
 
         initializeClasses();
@@ -50,9 +48,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-        if(!Flashlight.running && flashBusy) {
+        if(!flashlight.isOn() && Flashlight.isBusy) {
             camera = null;
-        } else if(!Flashlight.running) {
+        } else if(!flashlight.isOn()) {
             destroyCamera();
         }
     }
@@ -75,13 +73,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private void setAppWindowFullScreen() {
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-        );
-    }
-
     private void initializeCamera() {
         if(camera == null) {
             try {
@@ -91,7 +82,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             } catch(RuntimeException e) {
                 Log.e("FLASHLIGHT", "Resource busy.");
                 helpers.showFlashlightBusyDialog();
-                flashBusy = true;
+                Flashlight.isBusy = true;
             }
         }
     }
@@ -101,11 +92,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         camera = null;
     }
 
-    private void initializeClasses() {
-        helpers = new Helpers(MainActivity.this);
-    }
     public void importNotification() { notification = new NotificationFeature(MainActivity.this);}
-    private void initializeXmlReferences() {
-        switcher = (Button) findViewById(R.id.switcher);
-    }
+
+    private void initializeClasses() { helpers = new Helpers(MainActivity.this); }
+    
+    private void initializeXmlReferences() { switcher = (Button) findViewById(R.id.switcher); }
 }

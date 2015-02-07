@@ -14,29 +14,15 @@ import java.util.Arrays;
 public class Flashlight {
 
     private String[] whiteListedDevices = {"dlx", "mako", "ghost"};
-    public static boolean running = false;
+    private boolean isRunning = false;
+    public static boolean isBusy = false;
 
     private Camera camera;
     private Camera.Parameters params;
 
-
-    public void turnOn() {
-        if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
-            setCameraPreviewWithTorchOn();
-        }
-        else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
-            setCameraPreviewWithTorchOn();
-        } else {
-            setVideoText();
-            setCameraPreviewWithTorchOn();
-        }
-    }
-
-    public void turnOff() {
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-        camera.setParameters(params);
-        camera.stopPreview();
-        running = false;
+    public Flashlight(Camera camera, Camera.Parameters params) {
+        this.camera = camera;
+        this.params = params;
     }
 
     public static boolean isAvailable(Context context) {
@@ -47,12 +33,36 @@ public class Flashlight {
         return availability;
     }
 
-    public boolean isOn() {
-        return running;
+    public boolean isOn() { return isRunning; }
+
+    public void turnOn() {
+        if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
+            setCameraPreviewWithTorchOn();
+        }
+        else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
+            setCameraPreviewWithTorchOn();
+        } else {
+            setVideoTexture();
+            setCameraPreviewWithTorchOn();
+        }
+    }
+
+    public void turnOff() {
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(params);
+        camera.stopPreview();
+        isRunning = false;
+    }
+
+    private void setCameraPreviewWithTorchOn() {
+        camera.startPreview();
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(params);
+        isRunning = true;
     }
 
     @TargetApi(11)
-    private void setVideoText() {
+    private void setVideoTexture() {
         // Flashlight does not work on many devices unless
         // surfaceTexture is set.
         SurfaceTexture mSurfaceTexture = new SurfaceTexture(0);
@@ -61,17 +71,5 @@ public class Flashlight {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void setCameraPreviewWithTorchOn() {
-        camera.startPreview();
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(params);
-        running = true;
-    }
-
-    public Flashlight(Camera camera, Camera.Parameters params) {
-        this.camera = camera;
-        this.params = params;
     }
 }
