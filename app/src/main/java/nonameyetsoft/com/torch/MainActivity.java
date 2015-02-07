@@ -11,6 +11,7 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
+    private boolean flashBusy = false;
     Button switcher;
     Camera camera;
     Camera.Parameters params;
@@ -20,15 +21,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-        );
+        setAppWindowFullScreen();
         setContentView(R.layout.activity_main);
 
         initializeClasses();
         initializeXmlReferences();
-        helpers.showErrorDialogIfFlashlightNotAvailable(MainActivity.this);
+        helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
     }
 
@@ -36,27 +34,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onBackPressed() {
         super.onBackPressed();
 
-        if(flashlight.isFlashOn()) {
-            flashlight.turnOffFlash();
+        if(flashlight.isOn()) {
+            flashlight.turnOff();
         }
-        camera.release();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initializeCamera();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(!flashlight.isFlashOn()) {
-            camera.release();
+        if(!Flashlight.running && flashBusy) {
             camera = null;
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (camera == null) {
-            initializeClasses();
+        } else if(!Flashlight.running) {
+            destroyCamera();
         }
     }
 
@@ -64,26 +59,44 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         switch(view.getId()) {
             case R.id.switcher:
-                if (!flashlight.isFlashOn()) {
-                    flashlight.turnOnFlash();
+                if (!flashlight.isOn()) {
+                    flashlight.turnOn();
                     switcher.setBackgroundResource(R.drawable.button_off);
                 } else {
-                    flashlight.turnOffFlash();
+                    flashlight.turnOff();
                     switcher.setBackgroundResource(R.drawable.button_on);
                 }
         }
     }
 
-    private void initializeClasses() {
-        helpers = new Helpers();
-        try {
-            camera = Camera.open();
-            params = camera.getParameters();
-            flashlight = new Flashlight(camera, params);
-        } catch(RuntimeException e) {
-            Log.e("FLASH_LIGHT", "Flashlight resource busy.");
-            helpers.showFlashlightBusyErrorDialog(MainActivity.this);
+    private void setAppWindowFullScreen() {
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
+    }
+
+    private void initializeCamera() {
+        if(camera == null) {
+            try {
+                camera = Camera.open();
+                params = camera.getParameters();
+                flashlight = new Flashlight(camera, params);
+            } catch(RuntimeException e) {
+                Log.e("FLASHLIGHT", "Resource busy.");
+                helpers.showFlashlightBusyDialog();
+                flashBusy = true;
+            }
         }
+    }
+
+    private void destroyCamera() {
+        camera.release();
+        camera = null;
+    }
+
+    private void initializeClasses() {
+        helpers = new Helpers(MainActivity.this);
     }
     
     private void initializeXmlReferences() {
