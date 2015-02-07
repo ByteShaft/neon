@@ -1,6 +1,7 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,13 +11,13 @@ import android.widget.Button;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
-
     private boolean flashBusy = false;
     Button switcher;
     Camera camera;
     Camera.Parameters params;
     Flashlight flashlight;
     Helpers helpers;
+    NotificationFeature notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +29,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         initializeXmlReferences();
         helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
+        importNotification();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
+        notification.notificationManager.cancel(446);
         if(flashlight.isOn()) {
             flashlight.turnOff();
         }
@@ -61,10 +63,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.switcher:
                 if (!flashlight.isOn()) {
                     flashlight.turnOn();
+                    notification.notifyMe();
                     switcher.setBackgroundResource(R.drawable.button_off);
+
                 } else {
                     flashlight.turnOff();
                     switcher.setBackgroundResource(R.drawable.button_on);
+                    notification.notificationManager.cancel(446);
+
                 }
         }
     }
@@ -98,7 +104,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void initializeClasses() {
         helpers = new Helpers(MainActivity.this);
     }
-    
+    public void importNotification() { notification = new NotificationFeature(MainActivity.this);}
     private void initializeXmlReferences() {
         switcher = (Button) findViewById(R.id.switcher);
     }
