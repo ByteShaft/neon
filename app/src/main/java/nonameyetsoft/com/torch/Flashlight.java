@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.media.tv.TvInputService;
 import android.os.Build;
 
 import java.io.IOException;
