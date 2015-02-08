@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if(!flashlight.isOn() && Flashlight.isBusy) {
             camera = null;
         } else if(!flashlight.isOn() && camera != null) {
-            destroyCamera();
+            flashlight.destroyCamera();
         }
     }
 
@@ -85,11 +85,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 Flashlight.isBusy = true;
             }
         }
-    }
-
-    private void destroyCamera() {
-        camera.release();
-        camera = null;
     }
 
 //    public void importNotification() { notification = new NotificationFeature(MainActivity.this);}
