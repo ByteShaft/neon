@@ -18,6 +18,7 @@ public class Flashlight {
 
     private Camera camera;
     private Camera.Parameters params;
+    private SurfaceTexture mSurfaceTexture;
 
     public Flashlight(Camera camera, Camera.Parameters params) {
         this.camera = camera;
@@ -36,7 +37,7 @@ public class Flashlight {
 
     public void turnOn() {
         // We have a list of "known-to-work" devices where we don't
-        // need any videoTexture hacks.
+        // need any videoTexture voodoo.
         if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
             setCameraPreviewWithTorchOn();
         }
@@ -45,8 +46,8 @@ public class Flashlight {
         // for such devices.
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
             setCameraPreviewWithTorchOn();
-            // For all other devices, start videoTexture before attempting to
-            // enable flash. <Known to be a bit slow>.
+        // For all other devices, start videoTexture before attempting to
+        // enable flash. This is expected to be a bit slow.
         } else {
             setVideoTexture();
             setCameraPreviewWithTorchOn();
@@ -57,6 +58,12 @@ public class Flashlight {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         camera.setParameters(params);
         camera.stopPreview();
+
+        // Release surfaceTexture on platforms that support it.
+        // This could potentially avoid us a few bugs and resource leak.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            releaseVideoTexture();
+        }
         isRunning = false;
     }
 
@@ -67,15 +74,32 @@ public class Flashlight {
         isRunning = true;
     }
 
+    public void destroyCamera() {
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
+        releaseVideoTexture();
+    }
+
     @TargetApi(11)
     private void setVideoTexture() {
         // Flashlight does not work on many devices unless
         // surfaceTexture is set.
-        SurfaceTexture mSurfaceTexture = new SurfaceTexture(0);
+        mSurfaceTexture = new SurfaceTexture(0);
         try {
             camera.setPreviewTexture(mSurfaceTexture);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void releaseVideoTexture() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            if(mSurfaceTexture != null) {
+                mSurfaceTexture.release();
+                mSurfaceTexture = null;
+            }
         }
     }
 }
