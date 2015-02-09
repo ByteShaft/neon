@@ -37,7 +37,6 @@ public class Helpers {
     }
 
     private AlertDialog buildErrorDialog(String title, String description, String buttonText) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(description);

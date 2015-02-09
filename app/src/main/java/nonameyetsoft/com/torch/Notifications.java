@@ -25,6 +25,12 @@ public class Notifications {
         showNotification();
     }
 
+    public void endNotification() {
+        if (manager != null) {
+            manager.cancel(ID);
+        }
+    }
+
     private void buildNotification() {
         notificationBuilder = new NotificationCompat.Builder(context);
 
