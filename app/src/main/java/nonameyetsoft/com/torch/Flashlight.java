@@ -6,13 +6,16 @@ import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 public class Flashlight {
 
-    private String[] whiteListedDevices = {"dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i"};
+    private String[] whiteListedDevices = {
+            "dlx", "mako", "ghost", "g2", "m0","ms013g", "LT26i", "klte"
+    };
     private boolean isRunning = false;
     public static boolean isBusy = false;
 
@@ -38,20 +41,22 @@ public class Flashlight {
         // We have a list of "known-to-work" devices where we don't
         // need any videoTexture hacks.
         if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
+            Log.i("NEON", "Running the faster code path.");
             setCameraPreviewWithTorchOn();
-            System.out.println("fast");
         }
         // We don't "officially" support gingerbread devices but we don't
         // want them to be left off, so we implemented this code as a gamble
         // for such devices.
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
+            Log.i("NEON", String.format("Running on an API level %d device, may not run",
+                                        Build.VERSION_CODES.GINGERBREAD));
             setCameraPreviewWithTorchOn();
-            // For all other devices, start videoTexture before attempting to
-            // enable flash. <Known to be a bit slow>.
+        // For all other devices, start videoTexture before attempting to
+        // enable flash. <Known to be a bit slow>.
         } else {
             setVideoTexture();
+            Log.i("NEON", "Running the slower code path.");
             setCameraPreviewWithTorchOn();
-            System.out.println("slow");
             System.out.println(Build.DEVICE);
         }
     }
