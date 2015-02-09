@@ -13,13 +13,12 @@ import java.util.Arrays;
 
 public class Flashlight {
 
+    public static boolean isBusy = false;
     private final String LOG_NAME = "NEON";
     private String[] whiteListedDevices = {
-            "dlx", "mako", "ghost", "g2", "m0","ms013g", "LT26i", "klte"
+            "dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i", "klte"
     };
     private boolean isRunning = false;
-    public static boolean isBusy = false;
-
     private Camera camera;
     private Camera.Parameters params;
     private SurfaceTexture mSurfaceTexture;
@@ -37,13 +36,15 @@ public class Flashlight {
         return availability;
     }
 
-    public boolean isOn() { return isRunning; }
+    public boolean isOn() {
+        return isRunning;
+    }
 
     public void turnOn() {
         Log.i(LOG_NAME, String.format("Device is %s", Build.DEVICE));
         // We have a list of "known-to-work" devices where we don't
         // need any videoTexture hacks.
-        if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
+        if (Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
             Log.i(LOG_NAME, "Running the faster code path.");
             setCameraPreviewWithTorchOn();
         }
@@ -52,7 +53,7 @@ public class Flashlight {
         // for such devices.
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR2) {
             Log.w(LOG_NAME, String.format("Running on an API level %d device, may not run",
-                                        Build.VERSION.SDK_INT));
+                    Build.VERSION.SDK_INT));
             setCameraPreviewWithTorchOn();
         // For all other devices, start videoTexture before attempting to
         // enable flash. <Known to be a bit slow>.
@@ -67,7 +68,9 @@ public class Flashlight {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         camera.setParameters(params);
         camera.stopPreview();
-        releaseVideoTexture();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            releaseVideoTexture();
+        }
         isRunning = false;
     }
 

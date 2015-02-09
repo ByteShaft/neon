@@ -10,9 +10,8 @@ import android.support.v4.app.NotificationCompat;
 
 public class Notifications {
 
-    private Activity context;
     private final int ID = 001;
-
+    private Activity context;
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager manager;
 
@@ -41,7 +40,7 @@ public class Notifications {
 
     private void addPendingNotify() {
         Intent intent = new Intent("android.intent.CLOSE_ACTIVITY");
-        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0 , intent, 0);
+        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         notificationBuilder.setContentIntent(pIntent);
     }
 

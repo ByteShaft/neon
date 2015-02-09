@@ -13,7 +13,7 @@ public class Helpers {
     }
 
     public void checkFlashlightAvailability() {
-        if(!Flashlight.isAvailable(context)) {
+        if (!Flashlight.isAvailable(context)) {
             showFlashlightNotAvailableDialog();
         }
     }

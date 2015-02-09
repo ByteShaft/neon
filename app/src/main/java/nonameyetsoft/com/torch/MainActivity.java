@@ -14,14 +14,21 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private boolean isReceiverRegistered = false;
-
     Button switcher;
     Camera camera;
     Camera.Parameters params;
     Flashlight flashlight;
     Helpers helpers;
     Notifications notifications;
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            flashlight.turnOff();
+            finish();
+        }
+    };
+    private boolean isReceiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(flashlight.isOn()) {
+        if (flashlight.isOn()) {
             flashlight.turnOff();
         }
     }
@@ -53,9 +60,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
-        if(!flashlight.isOn() && Flashlight.isBusy) {
+        if (!flashlight.isOn() && Flashlight.isBusy) {
             camera = null;
-        } else if(!flashlight.isOn() && camera != null) {
+        } else if (!flashlight.isOn() && camera != null) {
             destroyCamera();
         }
 
@@ -74,7 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.switcher:
                 if (!flashlight.isOn()) {
                     flashlight.turnOn();
@@ -89,12 +96,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initializeCamera() {
-        if(camera == null) {
+        if (camera == null) {
             try {
                 camera = Camera.open();
                 params = camera.getParameters();
                 flashlight = new Flashlight(camera, params);
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 Log.e("FLASHLIGHT", "Resource busy.");
                 helpers.showFlashlightBusyDialog();
                 Flashlight.isBusy = true;
@@ -111,15 +118,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         helpers = new Helpers(MainActivity.this);
         notifications = new Notifications(MainActivity.this);
     }
-    
-    private void initializeXmlReferences() { switcher = (Button) findViewById(R.id.switcher); }
 
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            flashlight.turnOff();
-            finish();
-        }
-    };
+    private void initializeXmlReferences() {
+        switcher = (Button) findViewById(R.id.switcher);
+    }
 }
