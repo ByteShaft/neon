@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class Flashlight {
 
-    private String[] whiteListedDevices = {"dlx", "mako", "ghost", "g2"};
+    private String[] whiteListedDevices = {"dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i"};
     private boolean isRunning = false;
     public static boolean isBusy = false;
 
@@ -39,6 +39,7 @@ public class Flashlight {
         // need any videoTexture hacks.
         if(Arrays.asList(whiteListedDevices).contains(Build.DEVICE)) {
             setCameraPreviewWithTorchOn();
+            System.out.println("fast");
         }
         // We don't "officially" support gingerbread devices but we don't
         // want them to be left off, so we implemented this code as a gamble
@@ -50,6 +51,8 @@ public class Flashlight {
         } else {
             setVideoTexture();
             setCameraPreviewWithTorchOn();
+            System.out.println("slow");
+            System.out.println(Build.DEVICE);
         }
     }
 
