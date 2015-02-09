@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="nonameyetsoft.com.torch" >
+    package="nonameyetsoft.com.neon" >
 
     <uses-permission android:name="android.permission.CAMERA"/>
 
@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name">
         <activity
-            android:name=".MainActivity"
+            android:name="com.byteshaft.neon.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
