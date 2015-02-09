@@ -53,7 +53,7 @@ public class Flashlight {
         // for such devices.
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR2) {
             Log.w(LOG_NAME, String.format("Running on an API level %d device, may not run",
-                    Build.VERSION.SDK_INT));
+                                          Build.VERSION.SDK_INT));
             setCameraPreviewWithTorchOn();
         // For all other devices, start videoTexture before attempting to
         // enable flash. <Known to be a bit slow>.
