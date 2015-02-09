@@ -10,9 +10,8 @@ import android.support.v4.app.NotificationCompat;
 
 public class Notifications {
 
+    private final int ID = 1;
     private Activity context;
-    private final int ID = 001;
-
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager manager;
 
@@ -24,6 +23,12 @@ public class Notifications {
         buildNotification();
         addPendingNotify();
         showNotification();
+    }
+
+    public void endNotification() {
+        if (manager != null) {
+            manager.cancel(ID);
+        }
     }
 
     private void buildNotification() {
@@ -41,7 +46,7 @@ public class Notifications {
 
     private void addPendingNotify() {
         Intent intent = new Intent("android.intent.CLOSE_ACTIVITY");
-        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0 , intent, 0);
+        PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         notificationBuilder.setContentIntent(pIntent);
     }
 
