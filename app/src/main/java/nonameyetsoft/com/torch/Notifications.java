@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 public class Notifications {
 
-    private final int ID = 001;
+    private final int ID = 1;
     private Activity context;
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager manager;
