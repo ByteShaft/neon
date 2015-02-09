@@ -49,4 +49,8 @@ public class Notifications {
         manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(ID, notificationBuilder.build());
     }
+    public void turnOfnotificationOnTurnOff(){
+
+        manager.cancel(ID);
+    }
 }
