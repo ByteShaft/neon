@@ -14,6 +14,8 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
+    private boolean isReceiverRegistered = false;
+
     Button switcher;
     Camera camera;
     Camera.Parameters params;
@@ -29,6 +31,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         initializeXmlReferences();
         IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
         registerReceiver(mReceiver, filter);
+        isReceiverRegistered = true;
         helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
     }
@@ -55,9 +58,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else if(!flashlight.isOn() && camera != null) {
             destroyCamera();
         }
+
         // Unregister the broadcast receive when the app is
         // being closed to avoid leakage of resource.
-        unregisterReceiver(mReceiver);
+        if (isReceiverRegistered) {
+            // Be super cautious, incase the boolean state was
+            // incorrect.
+            try {
+                unregisterReceiver(mReceiver);
+            } catch (IllegalArgumentException e) {
+                Log.w("NEON", "Receiver not registered.");
+            }
+        }
     }
 
     @Override
