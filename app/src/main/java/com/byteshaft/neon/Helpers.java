@@ -1,4 +1,4 @@
-package nonameyetsoft.com.torch;
+package com.byteshaft.neon;
 
 import android.app.Activity;
 import android.app.AlertDialog;

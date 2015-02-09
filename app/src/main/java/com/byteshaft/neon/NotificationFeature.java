@@ -1,4 +1,4 @@
-package nonameyetsoft.com.torch;
+package com.byteshaft.neon;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -8,9 +8,6 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-
-import nonameyetsoft.com.torch.MainActivity;
-import nonameyetsoft.com.torch.R;
 
 /**
  * Created by husnain on 2/7/15.
