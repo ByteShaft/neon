@@ -32,8 +32,11 @@ public class Notifications {
         notificationBuilder.setContentTitle("Neon");
         notificationBuilder.setContentText("Tap to turn off.");
         notificationBuilder.setTicker("Flashlight on");
-        notificationBuilder.setAutoCancel(false);
+        // dismiss notification when its tapped.
+        notificationBuilder.setAutoCancel(true);
         notificationBuilder.setSmallIcon(R.drawable.ic_stat);
+        // disable slide to remove for the notification.
+        notificationBuilder.setOngoing(true);
     }
 
     private void addPendingNotify() {

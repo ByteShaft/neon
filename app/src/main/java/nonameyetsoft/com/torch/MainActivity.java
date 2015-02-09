@@ -55,6 +55,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else if(!flashlight.isOn() && camera != null) {
             destroyCamera();
         }
+        // Unregister the broadcast receive when the app is
+        // being closed to avoid leakage of resource.
+        unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -106,6 +109,5 @@ public class MainActivity extends Activity implements View.OnClickListener {
             flashlight.turnOff();
             finish();
         }
-
     };
 }
