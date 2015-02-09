@@ -47,7 +47,7 @@ public class Flashlight {
         // We don't "officially" support gingerbread devices but we don't
         // want them to be left off, so we implemented this code as a gamble
         // for such devices.
-        else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
+        else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
             Log.i("NEON", String.format("Running on an API level %d device, may not run",
                                         Build.VERSION_CODES.GINGERBREAD));
             setCameraPreviewWithTorchOn();
@@ -55,6 +55,7 @@ public class Flashlight {
         // enable flash. <Known to be a bit slow>.
         } else {
             setVideoTexture();
+            System.out.println(Build.VERSION.SDK_INT + "this is build version");
             Log.i("NEON", "Running the slower code path.");
             setCameraPreviewWithTorchOn();
             System.out.println(Build.DEVICE);

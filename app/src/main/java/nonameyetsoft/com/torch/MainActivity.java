@@ -72,6 +72,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 } else {
                     flashlight.turnOff();
                     switcher.setBackgroundResource(R.drawable.button_on);
+                    notifications.turnOfnotificationOnTurnOff();
                 }
         }
     }
