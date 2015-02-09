@@ -1,6 +1,10 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +19,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     Camera.Parameters params;
     Flashlight flashlight;
     Helpers helpers;
-   // NotificationFeature notification;
+    Notifications notifications;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,16 +27,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         initializeClasses();
         initializeXmlReferences();
+        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
+        registerReceiver(mReceiver, filter);
         helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
-//        importNotification();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        // notification remove when backPressed...and App closed.
-       // notification.notificationManager.cancel(446);
         if(flashlight.isOn()) {
             flashlight.turnOff();
         }
@@ -60,15 +63,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.switcher:
                 if (!flashlight.isOn()) {
                     flashlight.turnOn();
-                   // notification.notifyMe();
+                    notifications.startNotification();
                     switcher.setBackgroundResource(R.drawable.button_off);
 
                 } else {
                     flashlight.turnOff();
                     switcher.setBackgroundResource(R.drawable.button_on);
-                    // notification disappear when flashlight off..
-
-//                    notification.notificationManager.cancel(446);
                 }
         }
     }
@@ -92,9 +92,20 @@ public class MainActivity extends Activity implements View.OnClickListener {
         camera = null;
     }
 
-//    public void importNotification() { notification = new NotificationFeature(MainActivity.this);}
-
-    private void initializeClasses() { helpers = new Helpers(MainActivity.this); }
+    private void initializeClasses() {
+        helpers = new Helpers(MainActivity.this);
+        notifications = new Notifications(MainActivity.this);
+    }
     
     private void initializeXmlReferences() { switcher = (Button) findViewById(R.id.switcher); }
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            flashlight.turnOff();
+            finish();
+        }
+
+    };
 }
