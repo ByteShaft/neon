@@ -16,7 +16,7 @@ public class Flashlight {
     public static boolean isBusy = false;
     private final String LOG_NAME = "NEON";
     private String[] whiteListedDevices = {
-            "dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i", "klte"
+            "dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i", "klte", "scorpion_mini"
     };
     private boolean isRunning = false;
     private Camera camera;
