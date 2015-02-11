@@ -1,11 +1,13 @@
 package nonameyetsoft.com.torch;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -19,11 +21,14 @@ public class Flashlight {
             "dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i", "klte", "scorpion_mini", "C6602"
     };
     private boolean isRunning = false;
+    private Activity context;
     private Camera camera;
     private Camera.Parameters params;
     private SurfaceTexture mSurfaceTexture;
+    private PowerManager.WakeLock mWakeLock;
 
-    public Flashlight(Camera camera, Camera.Parameters params) {
+    public Flashlight(Activity context, Camera camera, Camera.Parameters params) {
+        this.context = context;
         this.camera = camera;
         this.params = params;
     }
@@ -59,9 +64,12 @@ public class Flashlight {
         // enable flash. <Known to be a bit slow>.
         } else {
             Log.i(LOG_NAME, "Running the slower code path.");
-            setVideoTexture();
+            //setVideoTexture();
             setCameraPreviewWithTorchOn();
         }
+
+        getWakeLock();
+        mWakeLock.acquire();
     }
 
     public void turnOff() {
@@ -71,6 +79,11 @@ public class Flashlight {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             releaseVideoTexture();
         }
+
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
+
         isRunning = false;
     }
 
@@ -79,6 +92,11 @@ public class Flashlight {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
         camera.setParameters(params);
         isRunning = true;
+    }
+
+    private void getWakeLock() {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NEON");
     }
 
     @TargetApi(11)
