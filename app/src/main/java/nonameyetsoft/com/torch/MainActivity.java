@@ -8,11 +8,15 @@ import android.content.IntentFilter;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.IOException;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+
+public class MainActivity extends Activity implements View.OnClickListener, SurfaceHolder.Callback {
 
     Button switcher;
     Camera camera;
@@ -20,6 +24,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     Flashlight flashlight;
     Helpers helpers;
     Notifications notifications;
+    SurfaceHolder mHolder;
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
@@ -56,6 +61,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onStart() {
         super.onStart();
         initializeCamera();
+
+        SurfaceView preview = (SurfaceView)findViewById(R.id.preview);
+        SurfaceHolder mHolder = preview.getHolder();
+        mHolder.addCallback(MainActivity.this);
     }
 
     @Override
@@ -88,7 +97,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     flashlight.turnOn();
                     notifications.startNotification();
                     switcher.setBackgroundResource(R.drawable.button_off);
-
                 } else {
                     flashlight.turnOff();
                     notifications.endNotification();
@@ -97,12 +105,33 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mHolder = holder;
+        try {
+            camera.setPreviewDisplay(mHolder);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        mHolder = null;
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
     private void initializeCamera() {
         if (camera == null) {
             try {
                 camera = Camera.open();
                 params = camera.getParameters();
-                flashlight = new Flashlight(camera, params);
+                flashlight = new Flashlight(MainActivity.this, camera, params);
             } catch (RuntimeException e) {
                 Log.e("FLASHLIGHT", "Resource busy.");
                 helpers.showFlashlightBusyDialog();
