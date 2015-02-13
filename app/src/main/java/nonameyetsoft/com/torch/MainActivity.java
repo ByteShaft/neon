@@ -23,7 +23,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
     Camera.Parameters params;
     Flashlight flashlight;
     Helpers helpers;
-    Notifications notifications;
+    Notification notification;
     SurfaceHolder mHolder;
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -42,9 +42,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
         setContentView(R.layout.activity_main);
         initializeClasses();
         initializeXmlReferences();
-        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
-        registerReceiver(mReceiver, filter);
-        isReceiverRegistered = true;
+//        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
+//        registerReceiver(mReceiver, filter);
+//        isReceiverRegistered = true;
         helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
     }
@@ -60,6 +60,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
     @Override
     protected void onStart() {
         super.onStart();
+
+//        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
+//        registerReceiver(mReceiver, filter);
+//        isReceiverRegistered = true;
+
+
         initializeCamera();
 
         SurfaceView preview = (SurfaceView)findViewById(R.id.preview);
@@ -75,17 +81,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
         } else if (!flashlight.isOn() && camera != null) {
             destroyCamera();
         }
+    }
 
-        // Unregister the broadcast receive when the app is
-        // being closed to avoid leakage of resource.
-        if (isReceiverRegistered && !flashlight.isOn()) {
-            // Be super cautious, incase the boolean state was
-            // incorrect.
-            try {
-                unregisterReceiver(mReceiver);
-            } catch (IllegalArgumentException e) {
-                Log.w("NEON", "Receiver not registered.");
-            }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notification.clear();
+        if (isReceiverRegistered) {
+            unregisterReceiver(mReceiver);
         }
     }
 
@@ -95,12 +98,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
             case R.id.switcher:
                 if (!flashlight.isOn()) {
                     flashlight.turnOn();
-                    notifications.startNotification();
+                    notification.start();
                     switcher.setBackgroundResource(R.drawable.button_off);
+                    registerReceiver();
                 } else {
                     flashlight.turnOff();
-                    notifications.endNotification();
+                    notification.clear();
                     switcher.setBackgroundResource(R.drawable.button_on);
+                    unregisterReceiver();
                 }
         }
     }
@@ -126,6 +131,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
 
     }
 
+    private void registerReceiver() {
+        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
+        registerReceiver(mReceiver, filter);
+        isReceiverRegistered = true;
+    }
+
+    private void unregisterReceiver() {
+        if (isReceiverRegistered && !flashlight.isOn()) {
+            unregisterReceiver(mReceiver);
+        }
+    }
+
     private void initializeCamera() {
         if (camera == null) {
             try {
@@ -147,7 +164,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
 
     private void initializeClasses() {
         helpers = new Helpers(MainActivity.this);
-        notifications = new Notifications(MainActivity.this);
+        notification = new Notification(MainActivity.this);
     }
 
     private void initializeXmlReferences() {

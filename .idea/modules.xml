@@ -5,8 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/Torch.iml" filepath="$PROJECT_DIR$/Torch.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/neon.iml" filepath="$PROJECT_DIR$/neon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/neonTorch.iml" filepath="$PROJECT_DIR$/neonTorch.iml" />
       <module fileurl="file://$PROJECT_DIR$/torch.iml" filepath="$PROJECT_DIR$/torch.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wakelockFix.iml" filepath="$PROJECT_DIR$/wakelockFix.iml" />
     </modules>
   </component>
 </project>
