@@ -42,9 +42,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
         setContentView(R.layout.activity_main);
         initializeClasses();
         initializeXmlReferences();
-//        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
-//        registerReceiver(mReceiver, filter);
-//        isReceiverRegistered = true;
         helpers.checkFlashlightAvailability();
         switcher.setOnClickListener(this);
     }
@@ -60,17 +57,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
     @Override
     protected void onStart() {
         super.onStart();
-
-//        IntentFilter filter = new IntentFilter("android.intent.CLOSE_ACTIVITY");
-//        registerReceiver(mReceiver, filter);
-//        isReceiverRegistered = true;
-
-
         initializeCamera();
-
-        SurfaceView preview = (SurfaceView)findViewById(R.id.preview);
-        SurfaceHolder mHolder = preview.getHolder();
-        mHolder.addCallback(MainActivity.this);
+        setSurfaceHolder();
     }
 
     @Override
@@ -141,6 +129,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Surf
         if (isReceiverRegistered && !flashlight.isOn()) {
             unregisterReceiver(mReceiver);
         }
+    }
+
+    private void setSurfaceHolder() {
+        SurfaceView preview = (SurfaceView)findViewById(R.id.preview);
+        SurfaceHolder mHolder = preview.getHolder();
+        mHolder.addCallback(MainActivity.this);
     }
 
     private void initializeCamera() {
