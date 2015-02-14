@@ -8,24 +8,24 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 
-public class Notification {
+public class Notifications {
 
     private final int ID = 1;
     private Activity context;
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager manager;
 
-    public Notification(Activity context) {
+    public Notifications(Activity context) {
         this.context = context;
     }
 
-    public void start() {
+    public void startNotification() {
         buildNotification();
         addPendingNotify();
         showNotification();
     }
 
-    public void clear() {
+    public void endNotification() {
         if (manager != null) {
             manager.cancel(ID);
         }
