@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -13,19 +14,32 @@ import java.util.Arrays;
 
 public class Flashlight {
 
+    // Returns true if the camera torch is being used
+    // by the widget.
+    public static boolean isBusyByWidget = false;
+    // returns true if flashlight is being used
+    // by another process.
     public static boolean isBusy = false;
+    // The tag name to appear in logs.
     private final String LOG_NAME = "NEON";
+    // This is a list of devices which we have tested and
+    // are known to work without the use of surfaceTexture.
     private String[] whiteListedDevices = {
-            "dlx", "mako", "ghost", "g2", "m0", "ms013g", "LT26i", "klte", "scorpion_mini", "C6602"
+        "dlx", "mako", "ghost", "g2", "m0", "ms013g",
+        "LT26i", "klte", "scorpion_mini", "C6602"
     };
-    private boolean isRunning = false;
-    private Camera camera;
-    private Camera.Parameters params;
-    private SurfaceTexture mSurfaceTexture;
 
-    public Flashlight(Camera camera, Camera.Parameters params) {
-        this.camera = camera;
-        this.params = params;
+    private static boolean isRunning = false;
+    private Camera mCamera = null;
+    private Camera.Parameters mParams = null;
+    private Context mContext = null;
+    private PowerManager.WakeLock mWakeLock = null;
+    private SurfaceTexture mSurfaceTexture = null;
+
+    public Flashlight(Context context, Camera camera, Camera.Parameters params) {
+        this.mContext = context;
+        this.mCamera = camera;
+        this.mParams = params;
     }
 
     public static boolean isAvailable(Context context) {
@@ -36,7 +50,8 @@ public class Flashlight {
         return availability;
     }
 
-    public boolean isOn() {
+    public static boolean isOn() {
+        // Returns true if flashlight is on.
         return isRunning;
     }
 
@@ -62,23 +77,44 @@ public class Flashlight {
             setVideoTexture();
             setCameraPreviewWithTorchOn();
         }
+        // On some devices the phone gets really slow after waking from
+        // sleep, so we need to set a partial wakelock to prevent the
+        // processor turning off.
+        mWakeLock = getWakeLock();
+        mWakeLock.acquire();
     }
 
     public void turnOff() {
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-        camera.setParameters(params);
-        camera.stopPreview();
+        mParams.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        mCamera.setParameters(mParams);
+        mCamera.stopPreview();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             releaseVideoTexture();
         }
+        releaseWakeLock();
         isRunning = false;
     }
 
     private void setCameraPreviewWithTorchOn() {
-        camera.startPreview();
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(params);
+        mParams.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        mCamera.setParameters(mParams);
+        mCamera.startPreview();
         isRunning = true;
+    }
+
+    private PowerManager getPowerManager() {
+        return (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+    }
+
+    private PowerManager.WakeLock getWakeLock() {
+        PowerManager pm = getPowerManager();
+        return pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NEON");
+    }
+
+    private void releaseWakeLock() {
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
     }
 
     @TargetApi(11)
@@ -87,7 +123,7 @@ public class Flashlight {
         // surfaceTexture is set.
         mSurfaceTexture = new SurfaceTexture(0);
         try {
-            camera.setPreviewTexture(mSurfaceTexture);
+            mCamera.setPreviewTexture(mSurfaceTexture);
         } catch (IOException e) {
             e.printStackTrace();
         }

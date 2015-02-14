@@ -7,8 +7,6 @@
     android:initialLayout="@layout/neon_widget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen|keyguard"
-    android:initialKeyguardLayout="@layout/neon_widget"
-    android:configure="nonameyetsoft.com.torch.NeonWidgetProvider"
-    >
+    android:initialKeyguardLayout="@layout/neon_widget">
 
     </appwidget-provider>

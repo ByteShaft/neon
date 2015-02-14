@@ -25,7 +25,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             flashlight.turnOff();
-            destroyCamera();
             finish();
         }
     };
@@ -47,7 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (flashlight.isOn()) {
+        if (Flashlight.isOn()) {
             flashlight.turnOff();
         }
     }
@@ -61,15 +60,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
-        if (!flashlight.isOn() && Flashlight.isBusy) {
+        if (!Flashlight.isOn() && Flashlight.isBusy ) {
             camera = null;
-        } else if (!flashlight.isOn() && camera != null) {
+        } else if (!Flashlight.isOn() && camera != null) {
             destroyCamera();
         }
-
         // Unregister the broadcast receive when the app is
         // being closed to avoid leakage of resource.
-        if (isReceiverRegistered && !flashlight.isOn()) {
+        if (!Flashlight.isOn() && isReceiverRegistered) {
             // Be super cautious, incase the boolean state was
             // incorrect.
             try {
@@ -81,16 +79,53 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (!Flashlight.isOn()) {
+            if (camera != null) { destroyCamera(); }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (Flashlight.isOn()) {
+            flashlight.turnOff();
+            notifications.endNotification();
+//            try {
+//                unregisterReceiver(mReceiver);
+//            } catch (IllegalArgumentException e) {
+//                Log.w("NEON", "Receiver not registered.");
+//            }
+            destroyCamera();
+        }
+        notifications.endNotification();
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.switcher:
-                if (!flashlight.isOn()) {
-                    flashlight.turnOn();
+                if (!Flashlight.isOn()) {
+                    // Turn on the flash in a new thread as this
+                    // operation could potentially block the UI.
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            flashlight.turnOn();
+                        }
+                    }).start();
                     notifications.startNotification();
                     switcher.setBackgroundResource(R.drawable.button_off);
-
                 } else {
-                    flashlight.turnOff();
+                    // Again, turning off flash is an expensive operation
+                    // on the UI thread, do it in a different thread.
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            flashlight.turnOff();
+                        }
+                    }).start();
                     notifications.endNotification();
                     switcher.setBackgroundResource(R.drawable.button_on);
                 }
@@ -98,17 +133,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initializeCamera() {
-        if (camera == null) {
-            try {
-                camera = Camera.open();
-                params = camera.getParameters();
-                flashlight = new Flashlight(camera, params);
-            } catch (RuntimeException e) {
-                Log.e("FLASHLIGHT", "Resource busy.");
-                helpers.showFlashlightBusyDialog();
-                Flashlight.isBusy = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (camera == null) {
+                    try {
+                        camera = Camera.open();
+                        params = camera.getParameters();
+                        flashlight = new Flashlight(MainActivity.this, camera, params);
+                    } catch (RuntimeException e) {
+                        Log.e("FLASHLIGHT", "Resource busy.");
+
+                        // If camera is busy show the Error dialog in the
+                        // UI thread.
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                helpers.showFlashlightBusyDialog();
+                                Flashlight.isBusy = true;
+                            }
+                        });
+                    }
+                }
             }
-        }
+        }).start();
     }
 
     private void destroyCamera() {
