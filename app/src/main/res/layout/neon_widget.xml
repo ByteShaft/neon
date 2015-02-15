@@ -8,5 +8,5 @@
         android:layout_height="match_parent"
         android:minHeight="40dp"
         android:minWidth="40dp"
-        android:src="@drawable/button_widget_on" />
+        android:src="@drawable/button_widget_on"/>
 </RelativeLayout>
