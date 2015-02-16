@@ -5,8 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 public class WidgetReceiver extends BroadcastReceiver {
 
@@ -27,6 +29,12 @@ public class WidgetReceiver extends BroadcastReceiver {
             Flashlight.setIsOn(false);
         } else {
             Log.i(Flashlight.LOG_TAG, "turn on code.");
+            if (isCameraUsebyApp() && !Flashlight.isOn()) {
+                Toast.makeText(context, "Camera is in use by another app, " +
+                                "you cannot use torch till that app is running.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
             if (!FlashlightService.isRunning()) {
                 Log.i(Flashlight.LOG_TAG, "Starting service from the widget");
                 serviceIntent.putExtra("command", "turnOn");
@@ -40,5 +48,17 @@ public class WidgetReceiver extends BroadcastReceiver {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         appWidgetManager.updateAppWidget(new ComponentName(context, WidgetProvider.class),
                 views);
+    }
+
+    public boolean isCameraUsebyApp() {
+        Camera camera = null;
+        try {
+            camera = Camera.open();
+        } catch (RuntimeException e) {
+            return true;
+        } finally {
+            if (camera != null) camera.release();
+        }
+        return false;
     }
 }

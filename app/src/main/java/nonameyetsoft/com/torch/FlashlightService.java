@@ -32,6 +32,7 @@ public class FlashlightService extends Service {
     private WindowManager mWindowManager = null;
     private BroadcastReceiver mReceiver;
     private boolean isReceiverRegistered = false;
+    private int startId = 0;
 
     private boolean flashOn = false;
 
@@ -55,6 +56,8 @@ public class FlashlightService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        Log.i(Flashlight.LOG_TAG, "start command started.");
+        this.startId = startId;
         Bundle extras = intent.getExtras();
         if (extras != null) {
             String command = (String) extras.get("command");
@@ -96,13 +99,13 @@ public class FlashlightService extends Service {
                     Flashlight.LOG_TAG,
                     "Failed to open camera, probably in use by another App."
             );
+            Flashlight.setBusy(true);
+            if (!Flashlight.isBusyByWidget() && !Flashlight.isWidgetContext) {
+                Helpers.showFlashlightBusyDialog(MainActivity.getContext());
+            }
             // If we fail to open camera, make sure to kill the newly started
             // service, as it is of no use.
             stopSelf();
-            if (!Flashlight.isBusyByWidget()) {
-                Helpers.showFlashlightBusyDialog(MainActivity.getContext());
-                Flashlight.setBusy(true);
-            }
         }
     }
 

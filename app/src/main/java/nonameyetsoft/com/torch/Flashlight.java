@@ -10,7 +10,9 @@ public class Flashlight {
     private static boolean isBusyByWidget = false;
     private static boolean isBusy = false;
     private static boolean isRunning = false;
+    private static boolean isBusyByActivity = false;
     public static boolean isWidgetContext = false;
+    public static boolean activityRunning = false;
 
     public static boolean isAvailable(Context context) {
         PackageManager packageManager = context.getPackageManager();
@@ -26,10 +28,6 @@ public class Flashlight {
         isBusy = busy;
     }
 
-    public static boolean isBusy() {
-        return isBusy;
-    }
-
     public static void setInUseByWidget(boolean busy) {
         isBusyByWidget = busy;
     }
@@ -40,5 +38,9 @@ public class Flashlight {
 
     public static void setIsOn(boolean ON) {
         isRunning = ON;
+    }
+
+    public static void setIsBusyByActivity(boolean busy) {
+        isBusyByActivity = true;
     }
 }

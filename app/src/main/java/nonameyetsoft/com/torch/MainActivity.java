@@ -25,6 +25,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Flashlight.activityRunning = true;
         setContentView(R.layout.activity_main);
         instance = this;
         initializeXmlReferences();
@@ -93,6 +94,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.switcher:
                 if (!Flashlight.isOn()) {
                     FlashlightService.getInstance().lightenTorch();
+                    Flashlight.setIsBusyByActivity(true);
                     mSwitcher.setBackgroundResource(R.drawable.button_off);
                     setWidgetIconOn(true);
                 } else {
