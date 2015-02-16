@@ -5,45 +5,39 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Camera;
+import android.util.Log;
 import android.widget.RemoteViews;
 
-public class WidgetReceiver extends BroadcastReceiver{
-    private static Camera mCamera;
-    Camera.Parameters mParams;
-    private static Flashlight mFlashlight;
-    Context context;
+public class WidgetReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        this.context = context;
-        initializeCamera();
+        Log.i(Flashlight.LOG_TAG, "Widget tapped.");
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.neon_widget);
+        Intent serviceIntent = new Intent(context, FlashlightService.class);
 
-        if (mFlashlight == null) {
-            mParams = mCamera.getParameters();
-            mFlashlight = new Flashlight(context, mCamera, mParams);
-        }
-        if (!Flashlight.isOn()) {
-            views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
-            mFlashlight.turnOn();
-            Flashlight.isBusyByWidget = true;
-        } else {
+        if (Flashlight.isOn()) {
+            Log.i(Flashlight.LOG_TAG, "turn off code.");
             views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
-            mFlashlight.turnOff();
-            Flashlight.isBusyByWidget = false;
+            context.stopService(serviceIntent);
+            Flashlight.setInUseByWidget(false);
+            Flashlight.setIsOn(false);
+        } else {
+            Log.i(Flashlight.LOG_TAG, "turn on code.");
+            if (!FlashlightService.isRunning()) {
+                Log.i(Flashlight.LOG_TAG, "Starting service from the widget");
+                serviceIntent.putExtra("command", "turnOn");
+                context.startService(serviceIntent);
+            }
+            views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
+            Flashlight.setInUseByWidget(true);
+            Flashlight.setIsOn(true);
         }
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         appWidgetManager.updateAppWidget(new ComponentName(context, WidgetProvider.class),
                 views);
-    }
-
-    public void initializeCamera() {
-        if (mCamera == null) {
-            mCamera = Camera.open();
-        }
     }
 }

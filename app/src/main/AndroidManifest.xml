@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:allowBackup="true"
@@ -34,6 +35,8 @@
                 <action android:name="COM_FLASHLIGHT"/>
             </intent-filter>
         </receiver>
+
+        <service android:enabled="true" android:name=".FlashlightService"/>
     </application>
 
 </manifest>

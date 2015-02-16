@@ -1,6 +1,5 @@
 package nonameyetsoft.com.torch;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,11 +10,11 @@ import android.support.v4.app.NotificationCompat;
 public class Notifications {
 
     private final int ID = 1;
-    private Activity context;
+    private Context context;
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager manager;
 
-    public Notifications(Activity context) {
+    public Notifications(Context context) {
         this.context = context;
     }
 

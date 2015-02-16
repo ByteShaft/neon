@@ -6,37 +6,24 @@ import android.content.DialogInterface;
 
 public class Helpers {
 
-    private Activity context;
+    private Activity mContext;
 
     public Helpers(Activity context) {
-        this.context = context;
+        this.mContext = context;
     }
 
-    public void checkFlashlightAvailability() {
-        if (!Flashlight.isAvailable(context)) {
-            showFlashlightNotAvailableDialog();
-        }
-    }
-
-    public void showFlashlightBusyDialog() {
+    public static void showFlashlightBusyDialog(final Activity context) {
         String title = context.getString(R.string.dialog_title_resource_busy);
         String description = context.getString(R.string.dialog_description_resource_busy);
         String buttonText = context.getString(R.string.dialog_ok);
 
-        AlertDialog alertDialog = buildErrorDialog(title, description, buttonText);
+        AlertDialog alertDialog = buildErrorDialog(context, title, description, buttonText);
         alertDialog.show();
     }
 
-    private void showFlashlightNotAvailableDialog() {
-        String title = context.getString(R.string.dialog_title_flashlight_not_available);
-        String description = context.getString(R.string.dialog_description_flash_not_available);
-        String buttonText = context.getString(R.string.dialog_ok);
+    private static AlertDialog buildErrorDialog(final Activity context, String title,
+                                                String description, String buttonText) {
 
-        AlertDialog alertDialog = buildErrorDialog(title, description, buttonText);
-        alertDialog.show();
-    }
-
-    private AlertDialog buildErrorDialog(String title, String description, String buttonText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(description);
@@ -51,5 +38,20 @@ public class Helpers {
         });
 
         return builder.create();
+    }
+
+    public void checkFlashlightAvailability() {
+        if (!Flashlight.isAvailable(mContext)) {
+            showFlashlightNotAvailableDialog();
+        }
+    }
+
+    private void showFlashlightNotAvailableDialog() {
+        String title = mContext.getString(R.string.dialog_title_flashlight_not_available);
+        String description = mContext.getString(R.string.dialog_description_flash_not_available);
+        String buttonText = mContext.getString(R.string.dialog_ok);
+
+        AlertDialog alertDialog = buildErrorDialog(mContext, title, description, buttonText);
+        alertDialog.show();
     }
 }
