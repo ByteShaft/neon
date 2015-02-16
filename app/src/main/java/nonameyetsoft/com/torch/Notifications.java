@@ -37,7 +37,7 @@ public class Notifications {
         notificationBuilder.setContentText("Tap to turn off.");
         // dismiss notification when its tapped.
         notificationBuilder.setAutoCancel(true);
-        notificationBuilder.setSmallIcon(R.drawable.ic_launcher);
+        notificationBuilder.setSmallIcon(R.drawable.ic_notify);
         // disable slide to remove for the notification.
         notificationBuilder.setOngoing(true);
     }
