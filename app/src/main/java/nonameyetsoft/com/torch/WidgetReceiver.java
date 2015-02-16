@@ -17,6 +17,7 @@ public class WidgetReceiver extends BroadcastReceiver {
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.neon_widget);
         Intent serviceIntent = new Intent(context, FlashlightService.class);
+        Flashlight.isWidgetContext = true;
 
         if (Flashlight.isOn()) {
             Log.i(Flashlight.LOG_TAG, "turn off code.");

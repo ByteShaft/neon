@@ -80,11 +80,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        setWidgetIconOn(false);
         if (Flashlight.isOn()) {
             stopService(getFlashlightServiceIntent());
         }
         mNotifications.endNotification();
-        setWidgetIconOn(false);
     }
 
     @Override

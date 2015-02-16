@@ -1,7 +1,9 @@
 package nonameyetsoft.com.torch;
 
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.RemoteViews;
 
 import java.io.IOException;
 
@@ -96,11 +99,10 @@ public class FlashlightService extends Service {
             // If we fail to open camera, make sure to kill the newly started
             // service, as it is of no use.
             stopSelf();
-            Flashlight.setBusy(true);
             if (!Flashlight.isBusyByWidget()) {
                 Helpers.showFlashlightBusyDialog(MainActivity.getContext());
+                Flashlight.setBusy(true);
             }
-
         }
     }
 
@@ -153,12 +155,7 @@ public class FlashlightService extends Service {
             public void surfaceCreated(SurfaceHolder holder) {
                 setCameraPreview();
                 setCameraModeTorch(true);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mCamera.startPreview();
-                    }
-                }).start();
+                mCamera.startPreview();
                 flashOn = true;
                 Flashlight.setIsOn(true);
             }
@@ -199,7 +196,11 @@ public class FlashlightService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 stopSelf();
-
+                if (MainActivity.getContext() != null) {
+                    MainActivity.getContext().finish();
+                }
+                setWidgetIconOn(false);
+                Flashlight.setInUseByWidget(false);
             }
         };
     }
@@ -224,4 +225,19 @@ public class FlashlightService extends Service {
         setBroadcastReceiverIsRegistered(false);
     }
     ///////////////////////////////////////////////////////
+
+    private void setWidgetIconOn(boolean ON) {
+        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.neon_widget);
+        if (ON) {
+            Log.i(Flashlight.LOG_TAG, "Setting widget icon from app to ON");
+            views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
+        } else {
+            views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
+            Log.i(Flashlight.LOG_TAG, "Setting widget icon from app to OFF");
+        }
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        appWidgetManager.updateAppWidget(new ComponentName(this, WidgetProvider.class),
+                views);
+    }
 }
