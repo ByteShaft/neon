@@ -1,4 +1,4 @@
-package nonameyetsoft.com.torch;
+package com.byteshaft.neon;
 
 import android.content.Context;
 import android.os.PowerManager;

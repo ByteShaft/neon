@@ -1,4 +1,4 @@
-package nonameyetsoft.com.torch;
+package com.byteshaft.neon;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;

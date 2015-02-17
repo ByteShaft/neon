@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Neon Torch</string>
-    <string name="dialog_ok">Ok</string>
+    <string name="dialog_ok">OK</string>
     <string name="dialog_title_resource_busy">Resource Busy</string>
     <string name="dialog_description_resource_busy">        Camera Resource already in use.</string>
     <string name="dialog_title_flashlight_not_available">        Flashlight not detected.</string>
