@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -30,9 +31,8 @@ public class FlashlightService extends Service {
     private SurfaceView mPreview = null;
     private SystemManager mSystemManager = null;
     private WindowManager mWindowManager = null;
-    private BroadcastReceiver mReceiver;
+    private BroadcastReceiver mReceiver, mScreenStateReceiver;
     private boolean isReceiverRegistered = false;
-    private int startId = 0;
 
     private boolean flashOn = false;
 
@@ -51,13 +51,13 @@ public class FlashlightService extends Service {
         Log.i(Flashlight.LOG_TAG, "Service started.");
         instance = this;
         openCamera();
+        setScreenStateListener();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         Log.i(Flashlight.LOG_TAG, "start command started.");
-        this.startId = startId;
         Bundle extras = intent.getExtras();
         if (extras != null) {
             String command = (String) extras.get("command");
@@ -67,7 +67,7 @@ public class FlashlightService extends Service {
                 stopTorch();
             }
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -82,6 +82,7 @@ public class FlashlightService extends Service {
         if (notifications != null) {
             notifications.endNotification();
         }
+        unregisterScreenStateListener();
         Log.i(Flashlight.LOG_TAG, "Service down.");
     }
 
@@ -149,7 +150,7 @@ public class FlashlightService extends Service {
         }
     }
 
-    public void lightenTorch() {
+    public synchronized void lightenTorch() {
         mPreview = new SurfaceView(instance);
         mHolder = mPreview.getHolder();
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -165,7 +166,7 @@ public class FlashlightService extends Service {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+                holder.setFormat(PixelFormat.TRANSPARENT);
             }
 
             @Override
@@ -175,8 +176,9 @@ public class FlashlightService extends Service {
         });
 
         mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                1, 1, WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, 0, PixelFormat.UNKNOWN);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(1, 1,
+                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, 0,
+                PixelFormat.UNKNOWN);
         mWindowManager.addView(mPreview, params);
 
         mSystemManager = new SystemManager(this);
@@ -242,5 +244,32 @@ public class FlashlightService extends Service {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         appWidgetManager.updateAppWidget(new ComponentName(this, WidgetProvider.class),
                 views);
+    }
+
+    private void setScreenStateListener() {
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        mScreenStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF) && Build.MANUFACTURER
+                        .equals("HTC")) {
+                    restartTorch();
+                }
+            }
+        };
+        registerReceiver(mScreenStateReceiver, intentFilter);
+    }
+
+    private void unregisterScreenStateListener() {
+        try {
+            unregisterReceiver(mScreenStateReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.w(Flashlight.LOG_TAG, "Screen listener not registered.");
+        }
+    }
+
+    private void restartTorch() {
+        stopTorch();
+        lightenTorch();
     }
 }

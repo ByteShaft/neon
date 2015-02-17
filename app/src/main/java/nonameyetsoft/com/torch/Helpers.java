@@ -3,6 +3,7 @@ package nonameyetsoft.com.torch;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.hardware.Camera;
 
 public class Helpers {
 
@@ -10,6 +11,18 @@ public class Helpers {
 
     public Helpers(Activity context) {
         this.mContext = context;
+    }
+
+    public static boolean isCameraInUse() {
+        Camera camera = null;
+        try {
+            camera = Camera.open();
+        } catch (RuntimeException e) {
+            return true;
+        } finally {
+            if (camera != null) camera.release();
+        }
+        return false;
     }
 
     public static void showFlashlightBusyDialog(final Activity context) {

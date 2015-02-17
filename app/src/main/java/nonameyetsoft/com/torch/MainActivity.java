@@ -51,6 +51,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+        if (Helpers.isCameraInUse() && !Flashlight.isOn()) {
+            Helpers.showFlashlightBusyDialog(this);
+        }
         if (Flashlight.isBusyByWidget()) {
             mSwitcher.setBackgroundResource(R.drawable.button_off);
         } else {

@@ -11,6 +11,7 @@ public class Flashlight {
     private static boolean isBusy = false;
     private static boolean isRunning = false;
     private static boolean isBusyByActivity = false;
+    private static boolean isBusyByOtherApp = false;
     public static boolean isWidgetContext = false;
     public static boolean activityRunning = false;
 
@@ -42,5 +43,13 @@ public class Flashlight {
 
     public static void setIsBusyByActivity(boolean busy) {
         isBusyByActivity = true;
+    }
+
+    public static void setIsBusyByOtherApp(boolean busy) {
+        isBusyByOtherApp = true;
+    }
+
+    public static boolean isIsBusyByOtherApp() {
+        return isBusyByOtherApp;
     }
 }
