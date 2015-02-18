@@ -36,7 +36,11 @@
             </intent-filter>
         </receiver>
 
-        <service android:enabled="true" android:name=".FlashlightService"/>
+        <service android:enabled="true" android:name=".FlashlightService">
+            <intent-filter>
+                <action android:name="com.byteshaft.test" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

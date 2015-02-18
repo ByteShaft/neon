@@ -17,6 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -24,6 +25,7 @@ import java.io.IOException;
 public class FlashlightService extends Service {
 
     private static FlashlightService instance = null;
+    static final String TOAST = "com.byteshaft.test";
 
     private Camera mCamera = null;
     private Notifications notifications = null;
@@ -33,15 +35,10 @@ public class FlashlightService extends Service {
     private WindowManager mWindowManager = null;
     private BroadcastReceiver mReceiver, mScreenStateReceiver;
     private boolean isReceiverRegistered = false;
-
-    private boolean flashOn = false;
+    private boolean mCameraNotAvailable = false;
 
     public static boolean isRunning() {
         return instance != null;
-    }
-
-    public static FlashlightService getInstance() {
-        return instance;
     }
 
     /* Start Override methods of the Service class. */
@@ -50,7 +47,8 @@ public class FlashlightService extends Service {
         super.onCreate();
         Log.i(Flashlight.LOG_TAG, "Service started.");
         instance = this;
-        openCamera();
+        init();
+        Flashlight.setToggleInProgress(true);
         setScreenStateListener();
     }
 
@@ -74,16 +72,20 @@ public class FlashlightService extends Service {
     public void onDestroy() {
         super.onDestroy();
         instance = null;
-        if (flashOn) {
-            stopTorch();
+        if (!mCameraNotAvailable) {
+            if (Flashlight.isOn()) {
+                stopTorch();
+            }
+            destroyCamera();
+            removeSurfaceView();
+            if (notifications != null) {
+                notifications.endNotification();
+            }
+            unregisterScreenStateListener();
+            Flashlight.setToggleInProgress(false);
+            Flashlight.setInUseByWidget(false);
+            Log.i(Flashlight.LOG_TAG, "Service down.");
         }
-        destroyCamera();
-        removeSurfaceView();
-        if (notifications != null) {
-            notifications.endNotification();
-        }
-        unregisterScreenStateListener();
-        Log.i(Flashlight.LOG_TAG, "Service down.");
     }
 
     @Override
@@ -96,17 +98,20 @@ public class FlashlightService extends Service {
         try {
             mCamera = Camera.open();
         } catch (RuntimeException e) {
-            Log.w(
-                    Flashlight.LOG_TAG,
-                    "Failed to open camera, probably in use by another App."
+            Log.w(Flashlight.LOG_TAG,
+                  "Failed to open camera, probably in use by another App."
             );
             Flashlight.setBusy(true);
             if (!Flashlight.isBusyByWidget() && !Flashlight.isWidgetContext) {
                 Helpers.showFlashlightBusyDialog(MainActivity.getContext());
+            } else if (Flashlight.isWidgetContext) {
+                Flashlight.setIsBusyByOtherApp(true);
+                Intent i = new Intent(TOAST);
+                sendBroadcast(i);
             }
             // If we fail to open camera, make sure to kill the newly started
             // service, as it is of no use.
-            stopSelf();
+            stopService(new Intent(this, FlashlightService.class));
         }
     }
 
@@ -121,13 +126,17 @@ public class FlashlightService extends Service {
         setCameraModeTorch(false);
         mCamera.stopPreview();
         Flashlight.setIsOn(false);
-        flashOn = false;
         if (mSystemManager != null) {
             mSystemManager.releaseWakeLock();
         }
         if (isReceiverRegistered) {
             unregisterBroadcastReceiver();
             notifications.endNotification();
+        }
+        Flashlight.setToggleInProgress(false);
+        setWidgetIconOn(false);
+        if (MainActivity.mSwitcher != null) {
+            MainActivity.mSwitcher.setBackgroundResource(R.drawable.button_on);
         }
     }
 
@@ -151,17 +160,19 @@ public class FlashlightService extends Service {
     }
 
     public synchronized void lightenTorch() {
+        openCamera();
         mPreview = new SurfaceView(instance);
         mHolder = mPreview.getHolder();
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                setCameraPreview();
-                setCameraModeTorch(true);
-                mCamera.startPreview();
-                flashOn = true;
-                Flashlight.setIsOn(true);
+                if (mCamera != null) {
+                    setCameraPreview();
+                    setCameraModeTorch(true);
+                    mCamera.startPreview();
+                    Flashlight.setIsOn(true);
+                }
             }
 
             @Override
@@ -187,6 +198,11 @@ public class FlashlightService extends Service {
         mSystemManager.setWakeLock();
         registerBroadcastReceiver();
         notifications.startNotification();
+        Flashlight.setToggleInProgress(false);
+        setWidgetIconOn(true);
+        if (MainActivity.mSwitcher != null) {
+            MainActivity.mSwitcher.setBackgroundResource(R.drawable.button_off);
+        }
     }
 
     private void removeSurfaceView() {
@@ -234,11 +250,9 @@ public class FlashlightService extends Service {
     private void setWidgetIconOn(boolean ON) {
         RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.neon_widget);
         if (ON) {
-            Log.i(Flashlight.LOG_TAG, "Setting widget icon from app to ON");
             views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
         } else {
             views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
-            Log.i(Flashlight.LOG_TAG, "Setting widget icon from app to OFF");
         }
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
@@ -271,5 +285,19 @@ public class FlashlightService extends Service {
     private void restartTorch() {
         stopTorch();
         lightenTorch();
+    }
+
+    /////////////////////////////////////////////
+    private void init() {
+        BroadcastReceiver rec = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(context, "ok", Toast.LENGTH_SHORT).show();
+                System.out.println("OK");
+            }
+        };
+
+        IntentFilter filter = new IntentFilter("com.byteshaft.test");
+        registerReceiver(rec, filter);
     }
 }
