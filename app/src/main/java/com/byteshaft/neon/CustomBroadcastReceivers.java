@@ -1,6 +1,5 @@
 package com.byteshaft.neon;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -74,10 +73,7 @@ class Notification {
             @Override
             public void onReceive(Context context, Intent intent) {
                 mContext.stopService(new Intent(mContext, FlashlightService.class));
-                Activity mainActivity = MainActivity.getContext();
-                if (mainActivity != null) {
-                    mainActivity.finish();
-                }
+                MainActivity.stopApp();
                 mRemoteUi.setUiButtonsOn(false);
                 Flashlight.setInUseByWidget(false);
             }

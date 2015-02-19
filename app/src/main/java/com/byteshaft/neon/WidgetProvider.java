@@ -14,6 +14,8 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
                          int[] appWidgetIds) {
 
+        RemoteUpdateUiHelpers mRemoteUi = new RemoteUpdateUiHelpers(context);
+
         Intent receiver = new Intent(context, WidgetReceiver.class);
         receiver.setAction("COM_FLASHLIGHT");
         receiver.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
@@ -23,6 +25,18 @@ public class WidgetProvider extends AppWidgetProvider {
                 R.layout.neon_widget);
         views.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
 
+        if (Flashlight.isOn()) {
+            mRemoteUi.setUiButtonsOn(true);
+        }
         appWidgetManager.updateAppWidget(appWidgetIds, views);
+    }
+
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+        super.onDeleted(context, appWidgetIds);
+        if (Flashlight.isOn() && Flashlight.isRunningFromWidget()) {
+            Intent serviceIntent = new Intent(context, FlashlightService.class);
+            context.stopService(serviceIntent);
+        }
     }
 }

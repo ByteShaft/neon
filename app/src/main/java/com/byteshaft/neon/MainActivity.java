@@ -18,6 +18,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return instance;
     }
 
+    public static void stopApp() {
+        if (instance != null) {
+            instance.finish();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +74,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     mRemoteUi.setUiButtonsOn(true);
                     Intent serviceIntent = new Intent(this, FlashlightService.class);
                     startService(serviceIntent);
+                    Flashlight.setIsRunningFromWidget(false);
                 } else {
                     mRemoteUi.setUiButtonsOn(true);
                     stopService(getFlashlightServiceIntent());

@@ -7,7 +7,6 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -82,7 +81,6 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if (mCamera != null) {
             mRemoteUi.setUiButtonsOn(true);
-            holder.setFormat(format);
             setCameraPreview();
             setCameraModeTorch(true);
             mCamera.startPreview();
@@ -99,14 +97,13 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
         mPreview = new SurfaceView(instance);
         mHolder = mPreview.getHolder();
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mHolder.setFormat(PixelFormat.TRANSPARENT);
         mHolder.addCallback(this);
 
         mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(1, 1,
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, 0,
-                PixelFormat.TRANSPARENT);
-        params.gravity = Gravity.END | Gravity.BOTTOM;
+                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                PixelFormat.UNKNOWN);
         mWindowManager.addView(mPreview, params);
 
         mSystemManager.setWakeLock();
