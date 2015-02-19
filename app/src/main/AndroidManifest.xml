@@ -21,7 +21,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".WidgetProvider" android:icon="@drawable/button_widget_on" android:label="Neon Widget">
+        <receiver android:name=".WidgetProvider" android:icon="@drawable/button_widget_on"
+                  android:label="Neon Torch">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -38,7 +39,7 @@
 
         <service android:enabled="true" android:name=".FlashlightService">
             <intent-filter>
-                <action android:name="com.byteshaft.test" />
+                <action android:name="com.byteshaft.toast" />
             </intent-filter>
         </service>
     </application>

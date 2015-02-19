@@ -13,29 +13,24 @@ public class WidgetReceiver extends BroadcastReceiver {
         Log.i(Flashlight.LOG_TAG, "Widget tapped.");
 
         if (Flashlight.isToggleInProgress()) {
+            Log.i(Flashlight.LOG_TAG, "Widget tap ignored, too fast.");
             return;
         }
 
         Intent serviceIntent = new Intent(context, FlashlightService.class);
-        Flashlight.isWidgetContext = true;
+        RemoteUpdateUiHelpers mRemoteUi = new RemoteUpdateUiHelpers(context);
+        mRemoteUi.setUiButtonsOn(true);
+
+        Flashlight.setIsRunningFromWidget(true);
 
         if (Flashlight.isOn()) {
-            Log.i(Flashlight.LOG_TAG, "turn off code.");
+            Log.i(Flashlight.LOG_TAG, "Turning off from widget.");
             context.stopService(serviceIntent);
             Flashlight.setInUseByWidget(false);
         } else {
-            Log.i(Flashlight.LOG_TAG, "turn on code.");
-//            if (Helpers.isCameraInUse() && !Flashlight.isOn()) {
-//                Toast.makeText(context, "Camera Resource is busy by another application.",
-//                        Toast.LENGTH_SHORT).show();
-//                Flashlight.setIsBusyByOtherApp(true);
-//                return;
-//            }
-            if (!FlashlightService.isRunning()) {
-                Log.i(Flashlight.LOG_TAG, "Starting service from the widget");
-                serviceIntent.putExtra("command", "turnOn");
-                context.startService(serviceIntent);
-            }
+            Log.i(Flashlight.LOG_TAG, "Turning on from widget.");
+            Log.i(Flashlight.LOG_TAG, "Starting service from the widget");
+            context.startService(serviceIntent);
             Flashlight.setInUseByWidget(true);
         }
     }

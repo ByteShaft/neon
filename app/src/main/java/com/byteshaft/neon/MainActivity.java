@@ -12,6 +12,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static MainActivity instance = null;
     static Button mSwitcher;
     private Helpers mHelpers;
+    private RemoteUpdateUiHelpers mRemoteUi;
 
     public static MainActivity getContext() {
         return instance;
@@ -44,7 +45,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Helpers.showFlashlightBusyDialog(this);
         }
         if (Flashlight.isOn()) {
-            mSwitcher.setBackgroundResource(R.drawable.button_off);
+            mRemoteUi.setUiButtonsOn(true);
         }
     }
 
@@ -64,13 +65,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.switcher:
                 if (!Flashlight.isOn()) {
+                    mRemoteUi.setUiButtonsOn(true);
                     Intent serviceIntent = new Intent(this, FlashlightService.class);
-                    serviceIntent.putExtra("command", "turnOn");
                     startService(serviceIntent);
-                    Flashlight.setIsBusyByActivity(true);
                 } else {
+                    mRemoteUi.setUiButtonsOn(true);
                     stopService(getFlashlightServiceIntent());
-                    Flashlight.setIsBusyByActivity(false);
                     Flashlight.setInUseByWidget(false);
                 }
         }
@@ -82,6 +82,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void initializeClasses() {
         mHelpers = new Helpers(MainActivity.this);
+        mRemoteUi = new RemoteUpdateUiHelpers(MainActivity.this);
     }
 
     private void initializeXmlReferences() {

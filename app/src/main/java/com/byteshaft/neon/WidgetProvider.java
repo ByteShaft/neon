@@ -14,7 +14,6 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
                          int[] appWidgetIds) {
 
-
         Intent receiver = new Intent(context, WidgetReceiver.class);
         receiver.setAction("COM_FLASHLIGHT");
         receiver.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
@@ -25,7 +24,5 @@ public class WidgetProvider extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetIds, views);
-
     }
-
 }
