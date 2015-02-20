@@ -26,12 +26,11 @@ public class WidgetReceiver extends BroadcastReceiver {
         if (Flashlight.isOn()) {
             Log.i(Flashlight.LOG_TAG, "Turning off from widget.");
             context.stopService(serviceIntent);
-            Flashlight.setInUseByWidget(false);
+            Flashlight.setBusyByWidget(false);
         } else {
             Log.i(Flashlight.LOG_TAG, "Turning on from widget.");
-            Log.i(Flashlight.LOG_TAG, "Starting service from the widget");
             context.startService(serviceIntent);
-            Flashlight.setInUseByWidget(true);
+            Flashlight.setBusyByWidget(true);
         }
     }
 }

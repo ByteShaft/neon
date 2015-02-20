@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.hardware.Camera;
 
+@SuppressWarnings("deprecation")
 public class Helpers {
 
     private Activity mContext;
@@ -20,7 +21,9 @@ public class Helpers {
         } catch (RuntimeException e) {
             return true;
         } finally {
-            if (camera != null) camera.release();
+            if (camera != null) {
+                camera.release();
+            }
         }
         return false;
     }

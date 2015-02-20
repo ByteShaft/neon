@@ -75,7 +75,7 @@ class Notification {
                 mContext.stopService(new Intent(mContext, FlashlightService.class));
                 MainActivity.stopApp();
                 mRemoteUi.setUiButtonsOn(false);
-                Flashlight.setInUseByWidget(false);
+                Flashlight.setBusyByWidget(false);
             }
         };
     }
