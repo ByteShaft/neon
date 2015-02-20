@@ -28,7 +28,7 @@ public class RemoteUpdateUiHelpers {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
         RemoteViews views = WidgetProvider.mRemoteViews;
         if (views == null) {
-            views = new RemoteViews(mContext.getPackageName(), R.layout.neon_widget);
+            return;
         }
 
         if (ON) {
