@@ -26,7 +26,10 @@ public class RemoteUpdateUiHelpers {
 
     private void setWidgetIconOn(boolean ON) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
-        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.neon_widget);
+        RemoteViews views = WidgetProvider.mRemoteViews;
+        if (views == null) {
+            views = new RemoteViews(mContext.getPackageName(), R.layout.neon_widget);
+        }
 
         if (ON) {
             views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
