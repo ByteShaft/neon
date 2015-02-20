@@ -3,6 +3,7 @@ package com.byteshaft.neon;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.RemoteViews;
 
@@ -28,7 +29,8 @@ public class RemoteUpdateUiHelpers {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
         RemoteViews views = WidgetProvider.mRemoteViews;
         if (views == null) {
-            return;
+            Log.i(Flashlight.LOG_TAG, "Widget view was null, creating.");
+            views = new RemoteViews(mContext.getPackageName(), R.layout.neon_widget);
         }
 
         if (ON) {
