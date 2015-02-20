@@ -31,17 +31,8 @@
                        android:resource="@xml/neon_widget_info" />
         </receiver>
 
-        <receiver android:name=".WidgetReceiver">
-            <intent-filter>
-                <action android:name="COM_FLASHLIGHT"/>
-            </intent-filter>
-        </receiver>
-
-        <service android:enabled="true" android:name=".FlashlightService">
-            <intent-filter>
-                <action android:name="com.byteshaft.toast" />
-            </intent-filter>
-        </service>
+        <receiver android:name=".WidgetReceiver"/>
+        <service android:enabled="true" android:name=".FlashlightService"/>
     </application>
 
 </manifest>
