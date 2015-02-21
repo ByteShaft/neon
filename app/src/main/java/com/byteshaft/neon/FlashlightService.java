@@ -26,8 +26,7 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
     private SurfaceView mPreview = null;
     private SystemManager mSystemManager = null;
     private WindowManager mWindowManager = null;
-
-    private RemoteUpdateUiHelpers mRemoteUi;
+    private RemoteUpdateUiHelpers mRemoteUi = null;
 
     public static FlashlightService getInstance() {
         return instance;
@@ -120,6 +119,7 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
     private void openCamera() {
         try {
             mCamera = Camera.open();
+            // Only show notification if camera opens successfully.
             mNotifications.startNotification();
         } catch (RuntimeException e) {
             Log.w(Flashlight.LOG_TAG,
