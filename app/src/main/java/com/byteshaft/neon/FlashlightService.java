@@ -58,6 +58,9 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
         }
         destroyCamera();
         removeSurfaceView();
+        mCustomReceivers.unregisterReceivers();
+        mNotifications.endNotification();
+        mSystemManager.releaseWakeLock();
         Flashlight.setBusyByWidget(false);
         Flashlight.setToggleInProgress(false);
         Log.i(Flashlight.LOG_TAG, "Service down.");
@@ -105,22 +108,19 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
         createSystemOverlayForCameraPreview();
         mSystemManager.setWakeLock();
         mCustomReceivers.registerReceivers();
-        mNotifications.startNotification();
     }
 
     public void stopTorch() {
         setCameraModeTorch(false);
         mCamera.stopPreview();
         Flashlight.setIsOn(false);
-        mSystemManager.releaseWakeLock();
-        mCustomReceivers.unregisterReceivers();
-        mNotifications.endNotification();
         mRemoteUi.setUiButtonsOn(false);
     }
 
     private void openCamera() {
         try {
             mCamera = Camera.open();
+            mNotifications.startNotification();
         } catch (RuntimeException e) {
             Log.w(Flashlight.LOG_TAG,
                 "Failed to open camera, probably in use by another App.");
