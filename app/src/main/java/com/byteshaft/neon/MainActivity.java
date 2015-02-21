@@ -27,8 +27,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Flashlight.activityRunning = true;
         setContentView(R.layout.activity_main);
+        Flashlight.activityRunning = true;
         instance = this;
         initializeXmlReferences();
         initializeClasses();
@@ -65,6 +65,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        // If for any reason, flashlight is in the process
+        // of being ON or OFF, just eat the toggle to avoid
+        // any delayed toggle loop.
         if (Flashlight.isToggleInProgress()) {
             return;
         }
@@ -72,13 +75,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.switcher:
                 if (!Flashlight.isOn()) {
                     mRemoteUi.setUiButtonsOn(true);
-                    Intent serviceIntent = new Intent(this, FlashlightService.class);
-                    startService(serviceIntent);
+                    startService(getFlashlightServiceIntent());
                     Flashlight.setIsRunningFromWidget(false);
                 } else {
-                    mRemoteUi.setUiButtonsOn(true);
+                    mRemoteUi.setUiButtonsOn(false);
                     stopService(getFlashlightServiceIntent());
-                    Flashlight.setInUseByWidget(false);
+                    Flashlight.setBusyByWidget(false);
                 }
         }
     }

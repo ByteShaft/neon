@@ -1,9 +1,10 @@
 package com.byteshaft.neon;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.util.Log;
+import android.content.Intent;
 import android.widget.Button;
 import android.widget.RemoteViews;
 
@@ -27,20 +28,21 @@ public class RemoteUpdateUiHelpers {
 
     private void setWidgetIconOn(boolean ON) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
-        RemoteViews views = WidgetProvider.mRemoteViews;
-        if (views == null) {
-            Log.i(Flashlight.LOG_TAG, "Widget view was null, creating.");
-            views = new RemoteViews(mContext.getPackageName(), R.layout.neon_widget);
-        }
+        Intent receiver = new Intent(mContext, WidgetReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, receiver, 0);
+        RemoteViews mRemoteViews = new RemoteViews(mContext.getPackageName(),
+                R.layout.neon_widget);
+        mRemoteViews.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
 
         if (ON) {
-            views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
+            mRemoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
         } else {
-            views.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
+            mRemoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
         }
 
         appWidgetManager.updateAppWidget(new ComponentName(mContext, WidgetProvider.class),
-                views);
+                mRemoteViews);
     }
 
     private void setMainActivitySwitchOn(boolean ON) {

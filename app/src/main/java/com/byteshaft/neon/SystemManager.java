@@ -18,8 +18,10 @@ public class SystemManager {
     }
 
     public void releaseWakeLock() {
-        if (mWakeLock.isHeld()) {
-            mWakeLock.release();
+        if (mWakeLock != null) {
+            if (mWakeLock.isHeld()) {
+                mWakeLock.release();
+            }
         }
     }
 

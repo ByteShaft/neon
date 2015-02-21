@@ -24,16 +24,16 @@ public class Flashlight extends Application {
         return isRunning;
     }
 
-    public static void setInUseByWidget(boolean busy) {
+    public static void setIsOn(boolean ON) {
+        isRunning = ON;
+    }
+
+    public static void setBusyByWidget(boolean busy) {
         isBusyByWidget = busy;
     }
 
     public static boolean isBusyByWidget() {
         return isBusyByWidget;
-    }
-
-    public static void setIsOn(boolean ON) {
-        isRunning = ON;
     }
 
     public static void setToggleInProgress(boolean inProgress) {
