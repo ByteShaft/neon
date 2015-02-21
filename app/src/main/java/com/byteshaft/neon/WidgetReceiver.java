@@ -19,8 +19,8 @@ public class WidgetReceiver extends BroadcastReceiver {
 
         Intent serviceIntent = new Intent(context, FlashlightService.class);
         RemoteUpdateUiHelpers mRemoteUi = new RemoteUpdateUiHelpers(context);
-        mRemoteUi.setUiButtonsOn(true);
 
+        mRemoteUi.setUiButtonsOn(true);
         Flashlight.setIsRunningFromWidget(true);
 
         if (Flashlight.isOn()) {
