@@ -3,6 +3,7 @@ package com.byteshaft.neon;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.IBinder;
@@ -96,6 +97,7 @@ public class FlashlightService extends Service implements SurfaceHolder.Callback
 
     public void lightenTorch() {
         mPreview = new SurfaceView(instance);
+        mPreview.setBackgroundColor(Color.BLACK);
         mHolder = mPreview.getHolder();
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mHolder.addCallback(this);
