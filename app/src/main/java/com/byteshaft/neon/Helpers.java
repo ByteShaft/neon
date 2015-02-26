@@ -8,12 +8,6 @@ import android.hardware.Camera;
 @SuppressWarnings("deprecation")
 public class Helpers {
 
-    private Activity mContext;
-
-    public Helpers(Activity context) {
-        this.mContext = context;
-    }
-
     public static boolean isCameraInUse() {
         Camera camera = null;
         try {
@@ -54,20 +48,5 @@ public class Helpers {
         });
 
         return builder.create();
-    }
-
-    public void checkFlashlightAvailability() {
-        if (!Flashlight.isAvailable(mContext)) {
-            showFlashlightNotAvailableDialog();
-        }
-    }
-
-    private void showFlashlightNotAvailableDialog() {
-        String title = mContext.getString(R.string.dialog_title_flashlight_not_available);
-        String description = mContext.getString(R.string.dialog_description_flash_not_available);
-        String buttonText = mContext.getString(R.string.dialog_ok);
-
-        AlertDialog alertDialog = buildErrorDialog(mContext, title, description, buttonText);
-        alertDialog.show();
     }
 }

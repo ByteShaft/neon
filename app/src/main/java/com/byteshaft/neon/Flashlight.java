@@ -1,8 +1,6 @@
 package com.byteshaft.neon;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.pm.PackageManager;
 
 public class Flashlight extends Application {
 
@@ -14,11 +12,6 @@ public class Flashlight extends Application {
     private static boolean isRunningFromWidget = false;
     public static boolean activityRunning = false;
     public static boolean isToggleInProgress = false;
-
-    public static boolean isAvailable(Context context) {
-        PackageManager packageManager = context.getPackageManager();
-        return packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-    }
 
     public static boolean isOn() {
         return isRunning;

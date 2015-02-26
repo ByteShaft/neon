@@ -11,7 +11,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private static MainActivity instance = null;
     static Button mSwitcher;
-    private Helpers mHelpers;
     private RemoteUpdateUiHelpers mRemoteUi;
 
     public static MainActivity getContext() {
@@ -32,7 +31,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         instance = this;
         initializeXmlReferences();
         initializeClasses();
-        mHelpers.checkFlashlightAvailability();
         mSwitcher.setOnClickListener(this);
     }
 
@@ -90,7 +88,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initializeClasses() {
-        mHelpers = new Helpers(MainActivity.this);
         mRemoteUi = new RemoteUpdateUiHelpers(MainActivity.this);
     }
 
