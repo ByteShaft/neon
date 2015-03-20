@@ -31,6 +31,6 @@ public class SystemManager {
 
     private PowerManager.WakeLock getWakeLockManager() {
         PowerManager pm = getPowerManager();
-        return pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Flashlight.LOG_TAG);
+        return pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, AppGlobals.LOG_TAG);
     }
 }

@@ -2,33 +2,25 @@ package com.byteshaft.neon;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.hardware.Camera;
+import android.os.Handler;
+import android.widget.Toast;
 
-@SuppressWarnings("deprecation")
 public class Helpers {
 
-    public static boolean isCameraInUse() {
-        Camera camera = null;
-        try {
-            camera = Camera.open();
-        } catch (RuntimeException e) {
-            return true;
-        } finally {
-            if (camera != null) {
-                camera.release();
-            }
-        }
-        return false;
-    }
-
-    public static void showFlashlightBusyDialog(final Activity context) {
+    static void showFlashlightBusyDialog(final Activity context) {
         String title = context.getString(R.string.dialog_title_resource_busy);
         String description = context.getString(R.string.dialog_description_resource_busy);
         String buttonText = context.getString(R.string.dialog_ok);
 
         AlertDialog alertDialog = buildErrorDialog(context, title, description, buttonText);
         alertDialog.show();
+    }
+
+    static void showFlashlightBusyToast(Context context) {
+        Toast.makeText(context, "Camera resource seems to be busy by another app.",
+                Toast.LENGTH_SHORT).show();
     }
 
     private static AlertDialog buildErrorDialog(final Activity context, String title,
@@ -41,9 +33,14 @@ public class Helpers {
         builder.setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
 
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                context.finish();
+            public void onClick(final DialogInterface dialog, int which) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        context.finish();
+                    }
+                });
             }
         });
 

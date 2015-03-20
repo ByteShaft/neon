@@ -1,183 +1,114 @@
 package com.byteshaft.neon;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PixelFormat;
-import android.hardware.Camera;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.WindowManager;
 
-import java.io.IOException;
+import com.byteshaft.ezflashlight.CameraInitializationListener;
+import com.byteshaft.ezflashlight.Flashlight;
+import com.byteshaft.ezflashlight.FlashlightGlobals;
 
-@SuppressWarnings("deprecation")
-public class FlashlightService extends Service implements SurfaceHolder.Callback {
+public class FlashlightService extends Service implements CameraInitializationListener {
 
-    private static FlashlightService instance = null;
-
-    private Camera mCamera = null;
+    private static FlashlightService sFlashlightService = null;
     private CustomBroadcastReceivers mCustomReceivers = null;
     private Notifications mNotifications = null;
-    private SurfaceHolder mHolder = null;
-    private SurfaceView mPreview = null;
     private SystemManager mSystemManager = null;
-    private WindowManager mWindowManager = null;
     private RemoteUpdateUiHelpers mRemoteUi = null;
+    private com.byteshaft.ezflashlight.Flashlight mFlashlight = null;
+    private boolean AUTOSTART = true;
 
-    public static FlashlightService getInstance() {
-        return instance;
+    static FlashlightService getInstance() {
+        return sFlashlightService;
     }
 
-    /* Start Override methods of the Service class. */
+    private static void setServiceInstance(FlashlightService flashlightService) {
+        sFlashlightService = flashlightService;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-        Flashlight.setToggleInProgress(true);
-        instance = this;
+        setServiceInstance(this);
+        Log.i(AppGlobals.LOG_TAG, "Service started.");
         mRemoteUi = new RemoteUpdateUiHelpers(this);
         mCustomReceivers = new CustomBroadcastReceivers(this);
         mSystemManager = new SystemManager(this);
         mNotifications = new Notifications(this);
-        lightenTorch();
-        Flashlight.setToggleInProgress(false);
-        Log.i(Flashlight.LOG_TAG, "Service started.");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        AUTOSTART = intent.getBooleanExtra("autoStart", true);
+        mFlashlight = new Flashlight(this);
+        mFlashlight.setOnCameraStateChangeListener(this);
+        mFlashlight.initializeCamera();
+        return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        stopSelf();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Flashlight.setToggleInProgress(true);
-        instance = null;
-        if (Flashlight.isOn()) {
+        if (FlashlightGlobals.isFlashlightOn()) {
             stopTorch();
         }
-        destroyCamera();
-        removeSurfaceView();
-        mCustomReceivers.unregisterReceivers();
-        mNotifications.endNotification();
-        mSystemManager.releaseWakeLock();
-        Flashlight.setBusyByWidget(false);
-        Flashlight.setToggleInProgress(false);
-        Log.i(Flashlight.LOG_TAG, "Service down.");
+        mFlashlight.releaseAllResources();
+        setServiceInstance(null);
+        Log.i(AppGlobals.LOG_TAG, "Service down.");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-    /* End Override methods of the Service class. */
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        if (mCamera == null) {
-            openCamera();
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        if (mCamera != null) {
-            mRemoteUi.setUiButtonsOn(true);
-            setCameraPreview();
-            setCameraModeTorch(true);
-            mCamera.startPreview();
-            Flashlight.setIsOn(true);
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-    }
-
-    public void lightenTorch() {
-        mPreview = new SurfaceView(instance);
-        mPreview.setBackgroundColor(Color.BLACK);
-        mHolder = mPreview.getHolder();
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mHolder.addCallback(this);
-        /* SurfaceView cannot be used in a widget as designed
-        but google, hence torch won't work on all the devices
-        since a wide range of them require SurfaceView to be
-        created. To counter that we create a system overlay
-        window of 1x1px and show a dummy surface view on that. */
-        createSystemOverlayForCameraPreview();
-        mSystemManager.setWakeLock();
+    protected synchronized void lightenTorch() {
+        mRemoteUi.setUiButtonsOn(true);
+        mFlashlight.turnOn();
         mCustomReceivers.registerReceivers();
+        mNotifications.startNotification();
+        mSystemManager.setWakeLock();
     }
 
-    public void stopTorch() {
-        setCameraModeTorch(false);
-        mCamera.stopPreview();
-        Flashlight.setIsOn(false);
+    protected synchronized void stopTorch() {
         mRemoteUi.setUiButtonsOn(false);
+        mFlashlight.turnOff();
+        mNotifications.endNotification();
+        mCustomReceivers.unregisterReceivers();
+        mSystemManager.releaseWakeLock();
+        AppGlobals.setIsWidgetTapped(false);
     }
 
-    private void openCamera() {
-        try {
-            mCamera = Camera.open();
-            // Only show notification if camera opens successfully.
-            mNotifications.startNotification();
-        } catch (RuntimeException e) {
-            Log.w(Flashlight.LOG_TAG,
-                "Failed to open camera, probably in use by another App.");
-            if (!Flashlight.isBusyByWidget() && !Flashlight.isRunningFromWidget()) {
-                Helpers.showFlashlightBusyDialog(MainActivity.getContext());
-            } else if (Flashlight.isRunningFromWidget()) {
-                sendBroadcast(new Intent(Flashlight.TOAST_INTENT));
-                mRemoteUi.setUiButtonsOn(false);
-            }
-            // If we fail to open camera, make sure to kill the newly started
-            // service, as it is of no use.
-            stopSelf();
+    @Override
+    public void onCameraOpened() {
+        if (AUTOSTART) {
+            mRemoteUi.setUiButtonsOn(true);
         }
     }
 
-    private void destroyCamera() {
-        if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
+    @Override
+    public void onCameraViewSetup() {
+        if (AUTOSTART) {
+            lightenTorch();
         }
     }
 
-    private void setCameraPreview() {
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setCameraModeTorch(boolean ON) {
-        Camera.Parameters mParams = mCamera.getParameters();
-        if (ON) {
-            mParams.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-            mCamera.setParameters(mParams);
+    @Override
+    public void onCameraBusy() {
+        if (AppGlobals.isWidgetTapped()) {
+            mRemoteUi.setUiButtonsOn(false);
+            Helpers.showFlashlightBusyToast(getApplicationContext());
+            AppGlobals.setIsWidgetTapped(false);
         } else {
-            mParams.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-            mCamera.setParameters(mParams);
+            Helpers.showFlashlightBusyDialog(MainActivity.getInstance());
         }
+        stopSelf();
     }
-
-    private void createSystemOverlayForCameraPreview() {
-        mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(1, 1,
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-                PixelFormat.TRANSLUCENT);
-        params.gravity = Gravity.BOTTOM | Gravity.END;
-        mWindowManager.addView(mPreview, params);
-    }
-
-    private void removeSurfaceView() {
-        if (mWindowManager != null) {
-            mWindowManager.removeView(mPreview);
-        }
-    }
-
 }

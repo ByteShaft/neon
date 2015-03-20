@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 
+import com.byteshaft.ezflashlight.FlashlightGlobals;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -13,7 +14,7 @@ public class WidgetProvider extends AppWidgetProvider {
                          int[] appWidgetIds) {
 
         RemoteUpdateUiHelpers mRemoteUi = new RemoteUpdateUiHelpers(context);
-        if (Flashlight.isOn()) {
+        if (FlashlightGlobals.isFlashlightOn()) {
             mRemoteUi.setUiButtonsOn(true);
         } else {
             mRemoteUi.setUiButtonsOn(false);
@@ -23,7 +24,7 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         super.onDeleted(context, appWidgetIds);
-        if (Flashlight.isOn() && Flashlight.isRunningFromWidget()) {
+        if (FlashlightGlobals.isFlashlightOn() && AppGlobals.isWidgetTapped()) {
             Intent serviceIntent = new Intent(context, FlashlightService.class);
             context.stopService(serviceIntent);
         }

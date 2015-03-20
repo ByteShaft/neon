@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 public class CustomBroadcastReceivers {
 
@@ -14,7 +13,6 @@ public class CustomBroadcastReceivers {
 
     Notification mNotificationReceiver;
     ScreenStateListener mScreenStateListener;
-    CameraBusyToast mCameraBusyToast;
 
 
     public CustomBroadcastReceivers(Context context) {
@@ -25,19 +23,16 @@ public class CustomBroadcastReceivers {
     public void registerReceivers() {
         mNotificationReceiver.register();
         mScreenStateListener.register();
-        mCameraBusyToast.register();
     }
 
     public void unregisterReceivers() {
         mNotificationReceiver.unregister();
         mScreenStateListener.unregister();
-        mCameraBusyToast.unRegister();
     }
 
     private void initializeClasses() {
         mNotificationReceiver = new Notification(mContext);
         mScreenStateListener = new ScreenStateListener(mContext);
-        mCameraBusyToast = new CameraBusyToast(mContext);
     }
 }
 
@@ -63,7 +58,7 @@ class Notification {
         try {
             mContext.unregisterReceiver(mNotificationReceiver);
         } catch (IllegalArgumentException e) {
-            Log.w(Flashlight.LOG_TAG, "Receiver not registered.");
+            Log.w(AppGlobals.LOG_TAG, "Receiver not registered.");
         }
     }
 
@@ -75,7 +70,6 @@ class Notification {
                 mContext.stopService(new Intent(mContext, FlashlightService.class));
                 MainActivity.stopApp();
                 mRemoteUi.setUiButtonsOn(false);
-                Flashlight.setBusyByWidget(false);
             }
         };
     }
@@ -101,7 +95,7 @@ class ScreenStateListener {
         try {
             mContext.unregisterReceiver(mScreenStateReceiver);
         } catch (IllegalArgumentException e) {
-            Log.w(Flashlight.LOG_TAG, "Screen listener not registered.");
+            Log.w(AppGlobals.LOG_TAG, "Screen listener not registered.");
         }
     }
 
@@ -123,40 +117,5 @@ class ScreenStateListener {
             flashlightService.stopTorch();
             flashlightService.lightenTorch();
         }
-    }
-}
-
-
-class CameraBusyToast {
-
-    BroadcastReceiver mToastReceiver;
-    Context mContext;
-
-    public CameraBusyToast(Context context) {
-        mContext = context;
-    }
-
-    public void register() {
-        initialize();
-        IntentFilter filter = new IntentFilter(Flashlight.TOAST_INTENT);
-        mContext.registerReceiver(mToastReceiver, filter);
-    }
-
-    public void unRegister() {
-        try {
-            mContext.unregisterReceiver(mToastReceiver);
-        } catch (IllegalArgumentException e) {
-            Log.w(Flashlight.LOG_TAG, "Toast receiver not registered.");
-        }
-    }
-
-    private void initialize() {
-        mToastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Toast.makeText(context, "Camera resource seems to be busy by another app.",
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
     }
 }
