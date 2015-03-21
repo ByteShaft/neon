@@ -20,14 +20,14 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         return sActivityInstance;
     }
 
-    private void setActivityInstance(MainActivity mainActivity) {
-        sActivityInstance = mainActivity;
-    }
-
     static void stopApp() {
         if (sActivityInstance != null) {
             sActivityInstance.finish();
         }
+    }
+
+    private void setActivityInstance(MainActivity mainActivity) {
+        sActivityInstance = mainActivity;
     }
 
     @Override
