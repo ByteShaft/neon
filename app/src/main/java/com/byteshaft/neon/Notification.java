@@ -1,6 +1,5 @@
 package com.byteshaft.neon;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -9,50 +8,30 @@ import android.support.v4.app.NotificationCompat;
 
 public class Notification extends ContextWrapper {
 
-    private final int ID = 1;
-    private NotificationCompat.Builder mNotificationBuilder = null;
-    private NotificationManager mNotificationManager = null;
-
     public Notification(Context context) {
         super(context);
     }
 
-    void show() {
-        buildNotification();
-        setOnTapIntentAction();
-        showNotification();
+    android.app.Notification getNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        setupVisuals(builder);
+        setOnTapIntentAction(builder);
+        return builder.build();
     }
 
-    void dismiss() {
-        if (mNotificationManager != null) {
-            mNotificationManager.cancel(ID);
-        }
-    }
-
-    private void buildNotification() {
-        mNotificationBuilder = new NotificationCompat.Builder(this);
-
-        mNotificationBuilder.setContentTitle(getString(R.string.app_name));
-        mNotificationBuilder.setContentText(getString(R.string.notification_message));
+    private void setupVisuals(NotificationCompat.Builder builder) {
+        builder.setContentTitle(getString(R.string.app_name));
+        builder.setContentText(getString(R.string.notification_message));
         // dismiss notification when its tapped.
-        mNotificationBuilder.setAutoCancel(true);
-        mNotificationBuilder.setSmallIcon(R.drawable.ic_notify);
+        builder.setAutoCancel(true);
+        builder.setSmallIcon(R.drawable.ic_notify);
         // disable slide to remove for the notification.
-        mNotificationBuilder.setOngoing(true);
+        builder.setOngoing(true);
     }
 
-    private void setOnTapIntentAction() {
+    private void setOnTapIntentAction(NotificationCompat.Builder builder) {
         Intent intent = new Intent("com.byteshaft.neon.CLOSE_ACTIVITY");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-        mNotificationBuilder.setContentIntent(pendingIntent);
-    }
-
-    private void showNotification() {
-        mNotificationManager = getNotificationManager();
-        mNotificationManager.notify(ID, mNotificationBuilder.build());
-    }
-
-    private NotificationManager getNotificationManager() {
-        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        builder.setContentIntent(pendingIntent);
     }
 }

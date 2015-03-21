@@ -78,7 +78,12 @@ public class FlashlightService extends Service implements CameraInitializationLi
         mRemoteUi.setUiButtonsOn(true);
         mFlashlight.turnOn();
         mScreenStateListener.register();
-        mNotification.show();
+        /* Make is foreground service by showing a Notification,
+        this ensures the service does not get killed on low resources.
+        Unless the situation is really really bad.
+        786 is just a random ID for the notification.
+        */
+        startForeground(786, mNotification.getNotification());
         mSystemManager.setWakeLock();
     }
 
@@ -86,7 +91,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
         mRemoteUi.setUiButtonsOn(false);
         mFlashlight.turnOff();
         mScreenStateListener.unregister();
-        mNotification.dismiss();
+        stopForeground(true);
         mSystemManager.releaseWakeLock();
         AppGlobals.setIsWidgetTapped(false);
     }
