@@ -19,7 +19,7 @@ public class Helpers {
     }
 
     static void showFlashlightBusyToast(Context context) {
-        Toast.makeText(context, "Camera resource seems to be busy by another app.",
+        Toast.makeText(context, context.getString(R.string.toast_resource_busy),
                 Toast.LENGTH_SHORT).show();
     }
 

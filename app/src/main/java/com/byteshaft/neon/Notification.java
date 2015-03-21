@@ -32,8 +32,8 @@ public class Notification extends ContextWrapper {
     private void buildNotification() {
         mNotificationBuilder = new NotificationCompat.Builder(this);
 
-        mNotificationBuilder.setContentTitle("Neon");
-        mNotificationBuilder.setContentText("Tap to turn off.");
+        mNotificationBuilder.setContentTitle(getString(R.string.app_name));
+        mNotificationBuilder.setContentText(getString(R.string.notification_message));
         // dismiss notification when its tapped.
         mNotificationBuilder.setAutoCancel(true);
         mNotificationBuilder.setSmallIcon(R.drawable.ic_notify);
