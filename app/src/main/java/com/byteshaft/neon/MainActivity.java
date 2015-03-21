@@ -49,6 +49,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         } else if (!FlashlightService.isRunning()) {
             startServiceWithFlashlightAutoOn(false);
         }
+        AppGlobals.setIsWidgetTapped(false);
     }
 
     @Override
@@ -91,6 +92,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     }
 
     private void startServiceWithFlashlightAutoOn(boolean on) {
+        mServiceIntent.putExtra("STARTER", "activity");
         mServiceIntent.putExtra("AUTOSTART", on);
         startService(mServiceIntent);
     }

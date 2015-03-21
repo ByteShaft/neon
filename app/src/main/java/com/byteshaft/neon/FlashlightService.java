@@ -36,7 +36,6 @@ public class FlashlightService extends Service implements CameraInitializationLi
     public void onCreate() {
         super.onCreate();
         setServiceInstance(this);
-        Log.i(AppGlobals.LOG_TAG, "Service started.");
         mScreenStateListener = new ScreenStateListener(this);
         mRemoteUi = new RemoteUpdateUiHelpers(this);
         mSystemManager = new SystemManager(this);
@@ -45,6 +44,8 @@ public class FlashlightService extends Service implements CameraInitializationLi
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String serviceStarter = intent.getStringExtra("STARTER");
+        Log.i(AppGlobals.LOG_TAG, String.format("Service started from %s", serviceStarter));
         AUTOSTART = intent.getBooleanExtra("AUTOSTART", true);
         mFlashlight = new Flashlight(this);
         mFlashlight.setOnCameraStateChangeListener(this);
@@ -55,7 +56,9 @@ public class FlashlightService extends Service implements CameraInitializationLi
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        stopSelf();
+        if (!AppGlobals.isWidgetTapped()) {
+            stopSelf();
+        }
     }
 
     @Override
@@ -75,6 +78,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
     }
 
     synchronized void lightenTorch() {
+        Log.i(AppGlobals.LOG_TAG, "Turning on");
         mRemoteUi.setUiButtonsOn(true);
         mFlashlight.turnOn();
         mScreenStateListener.register();
@@ -98,9 +102,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
 
     @Override
     public void onCameraOpened() {
-        if (AUTOSTART) {
-            mRemoteUi.setUiButtonsOn(true);
-        }
+
     }
 
     @Override
