@@ -13,8 +13,8 @@ import com.byteshaft.ezflashlight.FlashlightGlobals;
 public class FlashlightService extends Service implements CameraInitializationListener {
 
     private static FlashlightService sFlashlightService = null;
-    private CustomBroadcastReceivers mCustomReceivers = null;
-    private Notifications mNotifications = null;
+    private ScreenStateListener mScreenStateListener = null;
+    private Notification mNotification = null;
     private SystemManager mSystemManager = null;
     private RemoteUpdateUiHelpers mRemoteUi = null;
     private com.byteshaft.ezflashlight.Flashlight mFlashlight = null;
@@ -33,10 +33,10 @@ public class FlashlightService extends Service implements CameraInitializationLi
         super.onCreate();
         setServiceInstance(this);
         Log.i(AppGlobals.LOG_TAG, "Service started.");
+        mScreenStateListener = new ScreenStateListener(this);
         mRemoteUi = new RemoteUpdateUiHelpers(this);
-        mCustomReceivers = new CustomBroadcastReceivers(this);
         mSystemManager = new SystemManager(this);
-        mNotifications = new Notifications(this);
+        mNotification = new Notification(this);
     }
 
     @Override
@@ -70,19 +70,19 @@ public class FlashlightService extends Service implements CameraInitializationLi
         return null;
     }
 
-    protected synchronized void lightenTorch() {
+    synchronized void lightenTorch() {
         mRemoteUi.setUiButtonsOn(true);
         mFlashlight.turnOn();
-        mCustomReceivers.registerReceivers();
-        mNotifications.startNotification();
+        mScreenStateListener.register();
+        mNotification.show();
         mSystemManager.setWakeLock();
     }
 
-    protected synchronized void stopTorch() {
+    synchronized void stopTorch() {
         mRemoteUi.setUiButtonsOn(false);
         mFlashlight.turnOff();
-        mNotifications.endNotification();
-        mCustomReceivers.unregisterReceivers();
+        mScreenStateListener.unregister();
+        mNotification.dismiss();
         mSystemManager.releaseWakeLock();
         AppGlobals.setIsWidgetTapped(false);
     }

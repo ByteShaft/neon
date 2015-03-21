@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 public class Helpers {
 
-    static void showFlashlightBusyDialog(final Activity context) {
+    static void showFlashlightBusyDialog(Activity context) {
         String title = context.getString(R.string.dialog_title_resource_busy);
         String description = context.getString(R.string.dialog_description_resource_busy);
         String buttonText = context.getString(R.string.dialog_ok);

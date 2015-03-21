@@ -59,6 +59,14 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (!FlashlightGlobals.isFlashlightOn()) {
+            stopService(mServiceIntent);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (!FlashlightGlobals.isFlashlightOn()) {

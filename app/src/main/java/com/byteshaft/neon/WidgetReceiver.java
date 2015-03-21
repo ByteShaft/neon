@@ -14,14 +14,14 @@ public class WidgetReceiver extends BroadcastReceiver {
         Log.i(AppGlobals.LOG_TAG, "Widget tapped.");
         AppGlobals.setIsWidgetTapped(true);
         Intent serviceIntent = new Intent(context, FlashlightService.class);
-        RemoteUpdateUiHelpers mRemoteUi = new RemoteUpdateUiHelpers(context);
+        RemoteUpdateUiHelpers remoteUi = new RemoteUpdateUiHelpers(context);
 
         if (FlashlightGlobals.isFlashlightOn()) {
             Log.i(AppGlobals.LOG_TAG, "Turning off from widget.");
             context.stopService(serviceIntent);
         } else {
             Log.i(AppGlobals.LOG_TAG, "Turning on from widget.");
-            mRemoteUi.setUiButtonsOn(true);
+            remoteUi.setUiButtonsOn(true);
             context.startService(serviceIntent);
         }
     }

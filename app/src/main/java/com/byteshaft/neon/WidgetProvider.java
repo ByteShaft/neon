@@ -10,14 +10,12 @@ import com.byteshaft.ezflashlight.FlashlightGlobals;
 public class WidgetProvider extends AppWidgetProvider {
 
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager,
-                         int[] appWidgetIds) {
-
-        RemoteUpdateUiHelpers mRemoteUi = new RemoteUpdateUiHelpers(context);
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        RemoteUpdateUiHelpers remoteUi = new RemoteUpdateUiHelpers(context);
         if (FlashlightGlobals.isFlashlightOn()) {
-            mRemoteUi.setUiButtonsOn(true);
+            remoteUi.setUiButtonsOn(true);
         } else {
-            mRemoteUi.setUiButtonsOn(false);
+            remoteUi.setUiButtonsOn(false);
         }
     }
 

@@ -31,6 +31,14 @@
                        android:resource="@xml/neon_widget_info" />
         </receiver>
 
+        <receiver
+            android:name=".NotificationTapListener"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.byteshaft.neon.CLOSE_ACTIVITY"/>
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".WidgetReceiver"/>
         <service android:enabled="true" android:name=".FlashlightService"/>
     </application>

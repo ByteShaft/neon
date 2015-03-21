@@ -1,36 +1,34 @@
 package com.byteshaft.neon;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.PowerManager;
 
-public class SystemManager {
+public class SystemManager extends ContextWrapper {
 
-    private PowerManager.WakeLock mWakeLock;
-    private Context mContext;
+    private PowerManager.WakeLock mWakeLock = null;
 
     public SystemManager(Context context) {
-        this.mContext = context;
+        super(context);
     }
 
-    public void setWakeLock() {
+    void setWakeLock() {
         mWakeLock = getWakeLockManager();
         mWakeLock.acquire();
     }
 
-    public void releaseWakeLock() {
-        if (mWakeLock != null) {
-            if (mWakeLock.isHeld()) {
-                mWakeLock.release();
-            }
+    void releaseWakeLock() {
+        if (mWakeLock != null && mWakeLock.isHeld()) {
+            mWakeLock.release();
         }
     }
 
     private PowerManager getPowerManager() {
-        return (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        return (PowerManager) getSystemService(Context.POWER_SERVICE);
     }
 
     private PowerManager.WakeLock getWakeLockManager() {
-        PowerManager pm = getPowerManager();
-        return pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, AppGlobals.LOG_TAG);
+        PowerManager powerManager = getPowerManager();
+        return powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, AppGlobals.LOG_TAG);
     }
 }
