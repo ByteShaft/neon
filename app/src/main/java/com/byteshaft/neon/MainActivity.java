@@ -46,9 +46,8 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         super.onStart();
         if (FlashlightGlobals.isFlashlightOn()) {
             mRemoteUi.setUiButtonsOn(true);
-        } else if (FlashlightService.getInstance() == null) {
-            mServiceIntent.putExtra("autoStart", false);
-            startService(mServiceIntent);
+        } else if (!FlashlightService.isRunning()) {
+            startServiceWithFlashlightAutoOn(false);
         }
     }
 
@@ -79,11 +78,20 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         switch (view.getId()) {
             case R.id.switcher:
                 if (!FlashlightGlobals.isFlashlightOn()) {
-                    FlashlightService.getInstance().lightenTorch();
+                    if (!FlashlightService.isRunning()) {
+                        startServiceWithFlashlightAutoOn(true);
+                    } else {
+                        FlashlightService.getInstance().lightenTorch();
+                    }
                     AppGlobals.setIsWidgetTapped(false);
                 } else {
                     FlashlightService.getInstance().stopTorch();
                 }
         }
+    }
+
+    private void startServiceWithFlashlightAutoOn(boolean on) {
+        mServiceIntent.putExtra("AUTOSTART", on);
+        startService(mServiceIntent);
     }
 }

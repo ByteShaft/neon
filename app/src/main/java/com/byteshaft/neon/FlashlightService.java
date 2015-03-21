@@ -24,6 +24,10 @@ public class FlashlightService extends Service implements CameraInitializationLi
         return sFlashlightService;
     }
 
+    static boolean isRunning() {
+        return sFlashlightService != null;
+    }
+
     private static void setServiceInstance(FlashlightService flashlightService) {
         sFlashlightService = flashlightService;
     }
@@ -41,7 +45,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        AUTOSTART = intent.getBooleanExtra("autoStart", true);
+        AUTOSTART = intent.getBooleanExtra("AUTOSTART", true);
         mFlashlight = new Flashlight(this);
         mFlashlight.setOnCameraStateChangeListener(this);
         mFlashlight.initializeCamera();
