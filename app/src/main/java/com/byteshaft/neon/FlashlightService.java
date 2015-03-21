@@ -2,6 +2,7 @@ package com.byteshaft.neon;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -96,7 +97,12 @@ public class FlashlightService extends Service implements CameraInitializationLi
     @Override
     public void onCameraViewSetup() {
         if (AUTOSTART) {
-            lightenTorch();
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    lightenTorch();
+                }
+            });
         }
     }
 
