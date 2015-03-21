@@ -20,12 +20,12 @@ public class WidgetReceiver extends BroadcastReceiver {
             Log.i(AppGlobals.LOG_TAG, "Turning off from widget.");
             context.stopService(serviceIntent);
         } else if (FlashlightService.isRunning()) {
-            /* In case when we Neon launcher icon is tapped from home screen
+            /* In case when the Neon launcher icon is tapped from home screen
             and quickly, at that time the widget icon is tapped as well, we
             come across this situation where the MainActivity shows flashlight
             icon as turned on but the flashlight is not really on. In any such
             case, just do nothing. This is a corner case and a real user may
-            never have come across this.
+            never had come across this.
              */
             Log.i(AppGlobals.LOG_TAG, "Service already running, will do nothing.");
         } else {

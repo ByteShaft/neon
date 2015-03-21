@@ -27,10 +27,10 @@ public class RemoteUpdateUiHelpers extends ContextWrapper {
 
     private void setWidgetIconOn(boolean ON) {
         AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
+        ComponentName widgetComponent = new ComponentName(this, WidgetProvider.class);
         Intent receiver = new Intent(this, WidgetReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, receiver, 0);
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.neon_widget);
-        remoteViews.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
 
         if (ON) {
             remoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
@@ -38,7 +38,8 @@ public class RemoteUpdateUiHelpers extends ContextWrapper {
             remoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
         }
 
-        widgetManager.updateAppWidget(new ComponentName(this, WidgetProvider.class), remoteViews);
+        remoteViews.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
+        widgetManager.updateAppWidget(widgetComponent, remoteViews);
     }
 
     private void setMainActivitySwitchOn(boolean ON) {
