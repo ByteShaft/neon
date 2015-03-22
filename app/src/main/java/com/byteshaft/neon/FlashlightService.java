@@ -91,7 +91,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
     }
 
     synchronized void stopTorch() {
-        Log.i(AppGlobals.LOG_TAG, "Turning on");
+        Log.i(AppGlobals.LOG_TAG, "Turning off");
         mRemoteUi.setUiButtonsOn(false);
         mFlashlight.turnOff();
         stopForeground(true);
