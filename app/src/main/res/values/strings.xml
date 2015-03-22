@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <string name="main_button_description">The main toggle to turn on/off torch</string>
     <string name="app_name">Neon Torch</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_title_resource_busy">Resource Busy</string>
     <string name="dialog_description_resource_busy">Camera Resource already in use.</string>
     <string name="toast_resource_busy">Camera resource seems to be busy by another app.</string>
     <string name="notification_message">Tap to turn off.</string>
-
 </resources>

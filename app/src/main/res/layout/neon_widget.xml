@@ -1,12 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="@dimen/widget_margin">
-
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin" >
     <ImageView
         android:id="@+id/NeonWidget"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minHeight="40dp"
         android:minWidth="40dp"
-        android:src="@drawable/button_widget_on"/>
+        android:src="@drawable/button_widget_on"
+        android:contentDescription="@string/main_button_description"/>
 </RelativeLayout>
