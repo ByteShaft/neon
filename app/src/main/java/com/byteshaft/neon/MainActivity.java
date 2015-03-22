@@ -3,6 +3,7 @@ package com.byteshaft.neon;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 
@@ -79,21 +80,34 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         switch (view.getId()) {
             case R.id.switcher:
                 if (!FlashlightGlobals.isFlashlightOn()) {
+                    mRemoteUi.setUiButtonsOn(true);
                     if (!FlashlightService.isRunning()) {
                         startServiceWithFlashlightAutoOn(true);
                     } else {
-                        FlashlightService.getInstance().lightenTorch();
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                FlashlightService.getInstance().lightenTorch();
+                            }
+                        });
                     }
                     AppGlobals.setIsWidgetTapped(false);
                 } else {
-                    FlashlightService.getInstance().stopTorch();
+                    mRemoteUi.setUiButtonsOn(false);
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            FlashlightService.getInstance().stopTorch();
+                        }
+                    });
                 }
         }
     }
 
-    private void startServiceWithFlashlightAutoOn(boolean on) {
-        mServiceIntent.putExtra("STARTER", "activity");
-        mServiceIntent.putExtra("AUTOSTART", on);
+    private void startServiceWithFlashlightAutoOn(boolean ON) {
+        final String STARTER = "app";
+        mServiceIntent.putExtra("STARTER", STARTER);
+        mServiceIntent.putExtra("AUTOSTART", ON);
         startService(mServiceIntent);
     }
 }

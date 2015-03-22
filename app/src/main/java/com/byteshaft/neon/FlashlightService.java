@@ -40,14 +40,14 @@ public class FlashlightService extends Service implements CameraInitializationLi
         mRemoteUi = new RemoteUpdateUiHelpers(this);
         mSystemManager = new SystemManager(this);
         mNotification = new Notification(this);
+        mFlashlight = new Flashlight(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String serviceStarter = intent.getStringExtra("STARTER");
-        Log.i(AppGlobals.LOG_TAG, String.format("Service started from %s", serviceStarter));
+        String starter = intent.getStringExtra("STARTER");
+        Log.i(AppGlobals.LOG_TAG, String.format("Service started from %s", starter));
         AUTOSTART = intent.getBooleanExtra("AUTOSTART", true);
-        mFlashlight = new Flashlight(this);
         mFlashlight.setOnCameraStateChangeListener(this);
         mFlashlight.initializeCamera();
         return START_NOT_STICKY;
@@ -67,6 +67,8 @@ public class FlashlightService extends Service implements CameraInitializationLi
         if (FlashlightGlobals.isFlashlightOn()) {
             stopTorch();
         }
+        mScreenStateListener.unregister();
+        mSystemManager.releaseWakeLock();
         mFlashlight.releaseAllResources();
         setServiceInstance(null);
         Log.i(AppGlobals.LOG_TAG, "Service down.");
@@ -79,24 +81,20 @@ public class FlashlightService extends Service implements CameraInitializationLi
 
     synchronized void lightenTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning on");
-        mRemoteUi.setUiButtonsOn(true);
         mFlashlight.turnOn();
-        mScreenStateListener.register();
         /* Make is foreground service by showing a Notification,
         this ensures the service does not get killed on low resources.
         Unless the situation is really really bad.
         786 is just a random ID for the notification.
         */
         startForeground(786, mNotification.getNotification());
-        mSystemManager.setWakeLock();
     }
 
     synchronized void stopTorch() {
+        Log.i(AppGlobals.LOG_TAG, "Turning on");
         mRemoteUi.setUiButtonsOn(false);
         mFlashlight.turnOff();
-        mScreenStateListener.unregister();
         stopForeground(true);
-        mSystemManager.releaseWakeLock();
         AppGlobals.setIsWidgetTapped(false);
     }
 
@@ -114,7 +112,11 @@ public class FlashlightService extends Service implements CameraInitializationLi
                     lightenTorch();
                 }
             });
+        } else {
+            mRemoteUi.setUiButtonsOn(false);
         }
+        mScreenStateListener.register();
+        mSystemManager.setWakeLock();
     }
 
     @Override

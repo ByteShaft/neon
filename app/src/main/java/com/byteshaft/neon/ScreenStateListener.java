@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 
+import com.byteshaft.ezflashlight.FlashlightGlobals;
+
 public class ScreenStateListener extends ContextWrapper {
 
     private BroadcastReceiver mReceiver = null;
@@ -21,7 +23,7 @@ public class ScreenStateListener extends ContextWrapper {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF) && Build.MANUFACTURER
-                        .equals("HTC")) {
+                        .equals("HTC") && FlashlightGlobals.isFlashlightOn()) {
                     restartTorch();
                 }
             }
