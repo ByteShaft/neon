@@ -4,45 +4,42 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.RemoteViews;
 
-public class RemoteUpdateUiHelpers {
-
-    private Context mContext = null;
+public class RemoteUpdateUiHelpers extends ContextWrapper {
 
     public RemoteUpdateUiHelpers(Context context) {
-        this.mContext = context;
+        super(context);
     }
 
-    public void setUiButtonsOn(boolean ON) {
+    void setUiButtonsOn(boolean ON) {
         if (ON) {
-            setWidgetIconOn(true);
             setMainActivitySwitchOn(true);
+            setWidgetIconOn(true);
         } else {
-            setWidgetIconOn(false);
             setMainActivitySwitchOn(false);
+            setWidgetIconOn(false);
         }
     }
 
     private void setWidgetIconOn(boolean ON) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
-        Intent receiver = new Intent(mContext, WidgetReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                mContext, 0, receiver, 0);
-        RemoteViews mRemoteViews = new RemoteViews(mContext.getPackageName(),
-                R.layout.neon_widget);
-        mRemoteViews.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
+        ComponentName widgetComponent = new ComponentName(this, WidgetProvider.class);
+        Intent receiver = new Intent(this, WidgetReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, receiver, 0);
+        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.neon_widget);
 
         if (ON) {
-            mRemoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
+            remoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_off);
         } else {
-            mRemoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
+            remoteViews.setImageViewResource(R.id.NeonWidget, R.drawable.button_widget_on);
         }
 
-        appWidgetManager.updateAppWidget(new ComponentName(mContext, WidgetProvider.class),
-                mRemoteViews);
+        remoteViews.setOnClickPendingIntent(R.id.NeonWidget, pendingIntent);
+        widgetManager.updateAppWidget(widgetComponent, remoteViews);
     }
 
     private void setMainActivitySwitchOn(boolean ON) {
