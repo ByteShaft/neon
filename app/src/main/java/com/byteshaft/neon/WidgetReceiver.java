@@ -19,11 +19,17 @@ package com.byteshaft.neon;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class WidgetReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (AppGlobals.isIsServiceSwitchInProgress()) {
+            Log.i(AppGlobals.LOG_TAG, "Widget tap interval too short, ignoring");
+            return;
+        }
+
         final String STARTER = "widget";
         AppGlobals.setIsWidgetTapped(true);
         Intent serviceIntent = new Intent(context, FlashlightService.class);

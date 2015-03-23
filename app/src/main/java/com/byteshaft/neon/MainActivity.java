@@ -19,7 +19,6 @@ package com.byteshaft.neon;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 
@@ -30,8 +29,8 @@ public class MainActivity extends Activity implements Button.OnClickListener {
 
     static Button mSwitcher = null;
     private static MainActivity sActivityInstance = null;
+    private static Intent sServiceIntent = null;
     private RemoteUpdateUiHelpers mRemoteUi = null;
-    private Intent mServiceIntent = null;
 
     static MainActivity getInstance() {
         return sActivityInstance;
@@ -55,7 +54,6 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         mRemoteUi = new RemoteUpdateUiHelpers(this);
         mSwitcher = (Button) findViewById(R.id.switcher);
         mSwitcher.setOnClickListener(this);
-        mServiceIntent = new Intent(this, FlashlightService.class);
     }
 
     @Override
@@ -72,14 +70,14 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        stopService(mServiceIntent);
+        stopFlashlightService();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (!FlashlightGlobals.isFlashlightOn()) {
-            stopService(mServiceIntent);
+            stopFlashlightService();
         }
     }
 
@@ -87,7 +85,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
         if (!FlashlightGlobals.isFlashlightOn()) {
-            stopService(mServiceIntent);
+            stopFlashlightService();
         }
     }
 
@@ -100,30 +98,43 @@ public class MainActivity extends Activity implements Button.OnClickListener {
                     if (!FlashlightService.isRunning()) {
                         startServiceWithFlashlightAutoOn(true);
                     } else {
-                        new Handler().post(new Runnable() {
+                        new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 FlashlightService.getInstance().lightenTorch();
                             }
-                        });
+                        }).start();
                     }
                     AppGlobals.setIsWidgetTapped(false);
                 } else {
                     mRemoteUi.setUiButtonsOn(false);
-                    new Handler().post(new Runnable() {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             FlashlightService.getInstance().stopTorch();
                         }
-                    });
+                    }).start();
                 }
         }
     }
 
     private void startServiceWithFlashlightAutoOn(boolean ON) {
         final String STARTER = "app";
-        mServiceIntent.putExtra("STARTER", STARTER);
-        mServiceIntent.putExtra("AUTOSTART", ON);
-        startService(mServiceIntent);
+        Intent serviceIntent = getServiceIntent();
+        serviceIntent.putExtra("STARTER", STARTER);
+        serviceIntent.putExtra("AUTOSTART", ON);
+        startService(serviceIntent);
+    }
+
+    private void stopFlashlightService() {
+        Intent serviceIntent = getServiceIntent();
+        stopService(serviceIntent);
+    }
+
+    private Intent getServiceIntent() {
+        if (sServiceIntent == null) {
+            sServiceIntent = new Intent(this, FlashlightService.class);
+        }
+        return sServiceIntent;
     }
 }

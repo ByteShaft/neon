@@ -33,10 +33,24 @@ public class RemoteUpdateUiHelpers extends ContextWrapper {
 
     void setUiButtonsOn(boolean ON) {
         if (ON) {
-            setMainActivitySwitchOn(true);
+            if (MainActivity.getInstance() != null) {
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setMainActivitySwitchOn(true);
+                    }
+                });
+            }
             setWidgetIconOn(true);
         } else {
-            setMainActivitySwitchOn(false);
+            if (MainActivity.getInstance() != null) {
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setMainActivitySwitchOn(false);
+                    }
+                });
+            }
             setWidgetIconOn(false);
         }
     }
