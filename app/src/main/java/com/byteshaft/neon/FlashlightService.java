@@ -18,7 +18,6 @@ package com.byteshaft.neon;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -52,6 +51,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
     public void onCreate() {
         super.onCreate();
         setServiceInstance(this);
+        AppGlobals.setIsServiceSwitchInProgress(true);
         mScreenStateListener = new ScreenStateListener(this);
         mRemoteUi = new RemoteUpdateUiHelpers(this);
         mSystemManager = new SystemManager(this);
@@ -80,6 +80,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mRemoteUi.setUiButtonsOn(false);
         if (FlashlightGlobals.isFlashlightOn()) {
             stopTorch();
         }
@@ -90,6 +91,8 @@ public class FlashlightService extends Service implements CameraInitializationLi
         Log.i(AppGlobals.LOG_TAG, "Service down.");
     }
 
+
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -98,20 +101,11 @@ public class FlashlightService extends Service implements CameraInitializationLi
     synchronized void lightenTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning on");
         mFlashlight.turnOn();
-        /* Make is foreground service by showing a Notification,
-        this ensures the service does not get killed on low resources.
-        Unless the situation is really really bad.
-        786 is just a random ID for the notification.
-        */
-        startForeground(786, mNotification.getNotification());
     }
 
     synchronized void stopTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning off");
-        mRemoteUi.setUiButtonsOn(false);
         mFlashlight.turnOff();
-        stopForeground(true);
-        AppGlobals.setIsWidgetTapped(false);
     }
 
     @Override
@@ -122,12 +116,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
     @Override
     public void onCameraViewSetup() {
         if (AUTOSTART) {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    lightenTorch();
-                }
-            });
+            lightenTorch();
         } else {
             mRemoteUi.setUiButtonsOn(false);
         }
@@ -145,5 +134,24 @@ public class FlashlightService extends Service implements CameraInitializationLi
             Helpers.showFlashlightBusyDialog(MainActivity.getInstance());
         }
         stopSelf();
+    }
+
+    @Override
+    public void onFlashlightOn() {
+        mRemoteUi.setUiButtonsOn(true);
+        /* Make is foreground service by showing a Notification,
+        this ensures the service does not get killed on low resources.
+        Unless the situation is really really bad.
+        786 is just a random ID for the notification.
+        */
+        startForeground(786, mNotification.getNotification());
+        AppGlobals.setIsServiceSwitchInProgress(false);
+    }
+
+    @Override
+    public void onFlashlightOff() {
+        mRemoteUi.setUiButtonsOn(false);
+        stopForeground(true);
+        AppGlobals.setIsWidgetTapped(false);
     }
 }

@@ -20,6 +20,7 @@ public class AppGlobals {
 
     static final String LOG_TAG = "NEON";
     private static boolean isWidgetTapped = false;
+    private static boolean isServiceSwitchInProgress = false;
 
     static boolean isWidgetTapped() {
         return isWidgetTapped;
@@ -27,5 +28,13 @@ public class AppGlobals {
 
     static void setIsWidgetTapped(boolean tapped) {
         isWidgetTapped = tapped;
+    }
+
+    static boolean isIsServiceSwitchInProgress() {
+        return isServiceSwitchInProgress;
+    }
+
+    static void setIsServiceSwitchInProgress(boolean switching) {
+        isServiceSwitchInProgress = switching;
     }
 }

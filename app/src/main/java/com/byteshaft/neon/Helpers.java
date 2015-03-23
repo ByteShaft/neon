@@ -25,6 +25,8 @@ import android.widget.Toast;
 
 public class Helpers {
 
+    private static Toast sToast = null;
+
     static void showFlashlightBusyDialog(Activity context) {
         String title = context.getString(R.string.dialog_title_resource_busy);
         String description = context.getString(R.string.dialog_description_resource_busy);
@@ -35,8 +37,18 @@ public class Helpers {
     }
 
     static void showFlashlightBusyToast(Context context) {
-        Toast.makeText(context, context.getString(R.string.toast_resource_busy),
-                Toast.LENGTH_SHORT).show();
+        if (sToast != null && sToast.getView().isShown()) {
+            sToast.cancel();
+        } else {
+            sToast = Toast.makeText(context, context.getString(R.string.toast_resource_busy),
+                    Toast.LENGTH_SHORT);
+        }
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                sToast.show();
+            }
+        });
     }
 
     private static AlertDialog buildErrorDialog(final Activity context, String title,
