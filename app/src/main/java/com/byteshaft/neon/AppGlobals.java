@@ -30,7 +30,7 @@ public class AppGlobals {
         isWidgetTapped = tapped;
     }
 
-    static boolean isIsServiceSwitchInProgress() {
+    static boolean isServiceSwitchInProgress() {
         return isServiceSwitchInProgress;
     }
 

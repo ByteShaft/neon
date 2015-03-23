@@ -87,6 +87,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
         mScreenStateListener.unregister();
         mSystemManager.releaseWakeLock();
         mFlashlight.releaseAllResources();
+        AppGlobals.setIsServiceSwitchInProgress(false);
         setServiceInstance(null);
         Log.i(AppGlobals.LOG_TAG, "Service down.");
     }
