@@ -91,8 +91,6 @@ public class FlashlightService extends Service implements CameraInitializationLi
         Log.i(AppGlobals.LOG_TAG, "Service down.");
     }
 
-
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;
