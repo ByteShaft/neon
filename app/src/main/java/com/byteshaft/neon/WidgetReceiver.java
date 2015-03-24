@@ -25,7 +25,7 @@ public class WidgetReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (AppGlobals.isIsServiceSwitchInProgress()) {
+        if (AppGlobals.isServiceSwitchInProgress()) {
             Log.i(AppGlobals.LOG_TAG, "Widget tap interval too short, ignoring");
             return;
         }
