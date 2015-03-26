@@ -99,11 +99,18 @@ public class FlashlightService extends Service implements CameraInitializationLi
 
     synchronized void lightenTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning on");
+        /* Make is foreground service by showing a Notification,
+        this ensures the service does not get killed on low resources.
+        Unless the situation is really really bad.
+        786 is just a random ID for the notification.
+        */
+        startForeground(786, mNotification.getNotification());
         mFlashlight.turnOn();
     }
 
     synchronized void stopTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning off");
+        stopForeground(true);
         mFlashlight.turnOff();
     }
 
@@ -138,19 +145,12 @@ public class FlashlightService extends Service implements CameraInitializationLi
     @Override
     public void onFlashlightOn() {
         mRemoteUi.setUiButtonsOn(true);
-        /* Make is foreground service by showing a Notification,
-        this ensures the service does not get killed on low resources.
-        Unless the situation is really really bad.
-        786 is just a random ID for the notification.
-        */
-        startForeground(786, mNotification.getNotification());
         AppGlobals.setIsServiceSwitchInProgress(false);
     }
 
     @Override
     public void onFlashlightOff() {
         mRemoteUi.setUiButtonsOn(false);
-        stopForeground(true);
         AppGlobals.setIsWidgetTapped(false);
     }
 }
