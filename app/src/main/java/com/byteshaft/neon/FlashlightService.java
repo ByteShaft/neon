@@ -21,11 +21,11 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.byteshaft.ezflashlight.CameraInitializationListener;
+import com.byteshaft.ezflashlight.CameraStateChangeListener;
 import com.byteshaft.ezflashlight.Flashlight;
 import com.byteshaft.ezflashlight.FlashlightGlobals;
 
-public class FlashlightService extends Service implements CameraInitializationListener {
+public class FlashlightService extends Service implements CameraStateChangeListener {
 
     private static FlashlightService sFlashlightService = null;
     private ScreenStateListener mScreenStateListener = null;
@@ -64,7 +64,7 @@ public class FlashlightService extends Service implements CameraInitializationLi
         String starter = intent.getStringExtra("STARTER");
         Log.i(AppGlobals.LOG_TAG, String.format("Service started from %s", starter));
         AUTOSTART = intent.getBooleanExtra("AUTOSTART", true);
-        mFlashlight.setOnCameraStateChangeListener(this);
+        mFlashlight.setOnCameraStateChangedListener(this);
         mFlashlight.initializeCamera();
         return START_NOT_STICKY;
     }
@@ -143,13 +143,13 @@ public class FlashlightService extends Service implements CameraInitializationLi
     }
 
     @Override
-    public void onFlashlightOn() {
+    public void onFlashlightTurnedOn() {
         mRemoteUi.setUiButtonsOn(true);
         AppGlobals.setIsServiceSwitchInProgress(false);
     }
 
     @Override
-    public void onFlashlightOff() {
+    public void onFlashlightTurnedOff() {
         mRemoteUi.setUiButtonsOn(false);
         AppGlobals.setIsWidgetTapped(false);
     }
