@@ -51,7 +51,6 @@ public class FlashlightService extends Service implements CameraStateChangeListe
     public void onCreate() {
         super.onCreate();
         setServiceInstance(this);
-        AppGlobals.setIsServiceSwitchInProgress(true);
         mScreenStateListener = new ScreenStateListener(this);
         mRemoteUi = new RemoteUpdateUiHelpers(this);
         mSystemManager = new SystemManager(this);
@@ -87,7 +86,6 @@ public class FlashlightService extends Service implements CameraStateChangeListe
         mScreenStateListener.unregister();
         mSystemManager.releaseWakeLock();
         mFlashlight.releaseAllResources();
-        AppGlobals.setIsServiceSwitchInProgress(false);
         setServiceInstance(null);
         Log.i(AppGlobals.LOG_TAG, "Service down.");
     }
@@ -145,7 +143,6 @@ public class FlashlightService extends Service implements CameraStateChangeListe
     @Override
     public void onFlashlightTurnedOn() {
         mRemoteUi.setUiButtonsOn(true);
-        AppGlobals.setIsServiceSwitchInProgress(false);
     }
 
     @Override
