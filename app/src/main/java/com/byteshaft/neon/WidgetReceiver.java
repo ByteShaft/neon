@@ -20,22 +20,41 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.byteshaft.ezflashlight.FlashlightGlobals;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class WidgetReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        final String STARTER = "widget";
-        AppGlobals.setIsWidgetTapped(true);
-        Intent serviceIntent = new Intent(context, FlashlightService.class);
-        serviceIntent.putExtra("STARTER", STARTER);
-        RemoteUpdateUiHelpers remoteUi = new RemoteUpdateUiHelpers(context);
+    private static Timer sTimer = null;
 
-        if (FlashlightService.isRunning()) {
-            remoteUi.setUiButtonsOn(false);
-            context.stopService(serviceIntent);
-        } else {
-            remoteUi.setUiButtonsOn(true);
+    @Override
+    public void onReceive(final Context context, Intent intent) {
+        AppGlobals.setIsWidgetTapped(true);
+        final int SERVICE_SHUTDOWN_DELAY = 600;
+        final String STARTER = "widget";
+        Intent serviceIntent = new Intent(context, FlashlightService.class);
+        RemoteUpdateUiHelpers remoteUi = new RemoteUpdateUiHelpers(context);
+        Helpers helpers = new Helpers(context);
+        TimerTask serviceTimerTask = helpers.getServiceStopTimerTask(serviceIntent);
+
+        if (sTimer == null) {
+            sTimer = helpers.getTimer();
+        }
+
+        if (!FlashlightService.isRunning()) {
+            serviceIntent.putExtra("STARTER", STARTER);
             context.startService(serviceIntent);
+        } else if (FlashlightGlobals.isFlashlightOn()) {
+            remoteUi.setUiButtonsOn(false);
+            FlashlightService.getInstance().stopTorch();
+            sTimer.schedule(serviceTimerTask, SERVICE_SHUTDOWN_DELAY);
+        } else {
+            sTimer.cancel();
+            sTimer = null;
+            remoteUi.setUiButtonsOn(true);
+            FlashlightService.getInstance().lightenTorch();
         }
     }
 }

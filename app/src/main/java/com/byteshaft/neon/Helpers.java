@@ -19,13 +19,24 @@ package com.byteshaft.neon;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
 
-public class Helpers {
+import com.byteshaft.ezflashlight.FlashlightGlobals;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class Helpers extends ContextWrapper {
 
     private static Toast sToast = null;
+
+    public Helpers(Context base) {
+        super(base);
+    }
 
     static void showFlashlightBusyDialog(Activity context) {
         String title = context.getString(R.string.dialog_title_resource_busy);
@@ -49,6 +60,21 @@ public class Helpers {
                 sToast.show();
             }
         });
+    }
+
+    TimerTask getServiceStopTimerTask(final Intent serviceIntent) {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                if (!FlashlightGlobals.isFlashlightOn()) {
+                    stopService(serviceIntent);
+                }
+            }
+        };
+    }
+
+    Timer getTimer() {
+        return new Timer();
     }
 
     private static AlertDialog buildErrorDialog(final Activity context, String title,
