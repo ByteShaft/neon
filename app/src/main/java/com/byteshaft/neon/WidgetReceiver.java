@@ -44,6 +44,7 @@ public class WidgetReceiver extends BroadcastReceiver {
         }
 
         if (!FlashlightService.isRunning()) {
+            remoteUi.setUiButtonsOn(true);
             serviceIntent.putExtra("STARTER", STARTER);
             context.startService(serviceIntent);
         } else if (FlashlightGlobals.isFlashlightOn()) {
