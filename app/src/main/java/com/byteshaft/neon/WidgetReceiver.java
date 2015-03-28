@@ -52,10 +52,14 @@ public class WidgetReceiver extends BroadcastReceiver {
             FlashlightService.getInstance().stopTorch();
             sTimer.schedule(serviceTimerTask, SERVICE_SHUTDOWN_DELAY);
         } else {
-            sTimer.cancel();
-            sTimer = null;
+            cancelServiceStopTimer();
             remoteUi.setUiButtonsOn(true);
             FlashlightService.getInstance().lightenTorch();
         }
+    }
+
+    private void cancelServiceStopTimer() {
+        sTimer.cancel();
+        sTimer = null;
     }
 }
