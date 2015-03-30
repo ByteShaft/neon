@@ -62,6 +62,23 @@ public class Helpers extends ContextWrapper {
         });
     }
 
+    void startFlashlightServiceWithFlashlightOn(boolean ON) {
+        final String STARTER = "app";
+        Intent serviceIntent = getServiceIntent();
+        serviceIntent.putExtra("STARTER", STARTER);
+        serviceIntent.putExtra("AUTOSTART", ON);
+        startService(serviceIntent);
+    }
+
+    void stopFlashlightService() {
+        Intent serviceIntent = getServiceIntent();
+        stopService(serviceIntent);
+    }
+
+    private Intent getServiceIntent() {
+        return new Intent(this, FlashlightService.class);
+    }
+
     TimerTask getServiceStopTimerTask(final Intent serviceIntent) {
         return new TimerTask() {
             @Override
