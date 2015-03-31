@@ -63,8 +63,8 @@ public class FlashlightService extends Service implements CameraStateChangeListe
         String starter = intent.getStringExtra("STARTER");
         Log.i(AppGlobals.LOG_TAG, String.format("Service started from %s", starter));
         AUTOSTART = intent.getBooleanExtra("AUTOSTART", true);
-        mFlashlight.setOnCameraStateChangedListener(this);
-        mFlashlight.initializeCamera();
+        mFlashlight.setCameraStateChangedListener(this);
+        mFlashlight.setupCameraPreview();
         return START_NOT_STICKY;
     }
 
@@ -97,6 +97,7 @@ public class FlashlightService extends Service implements CameraStateChangeListe
 
     synchronized void lightenTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning on");
+        mRemoteUi.setUiButtonsOn(true);
         /* Make is foreground service by showing a Notification,
         this ensures the service does not get killed on low resources.
         Unless the situation is really really bad.
@@ -108,12 +109,14 @@ public class FlashlightService extends Service implements CameraStateChangeListe
 
     synchronized void stopTorch() {
         Log.i(AppGlobals.LOG_TAG, "Turning off");
+        mRemoteUi.setUiButtonsOn(false);
         stopForeground(true);
         mFlashlight.turnOff();
+        AppGlobals.setIsWidgetTapped(false);
     }
 
     @Override
-    public void onCameraOpened() {
+    public void onCameraInitialized() {
 
     }
 
@@ -138,16 +141,5 @@ public class FlashlightService extends Service implements CameraStateChangeListe
             Helpers.showFlashlightBusyDialog(MainActivity.getInstance());
         }
         stopSelf();
-    }
-
-    @Override
-    public void onFlashlightTurnedOn() {
-        mRemoteUi.setUiButtonsOn(true);
-    }
-
-    @Override
-    public void onFlashlightTurnedOff() {
-        mRemoteUi.setUiButtonsOn(false);
-        AppGlobals.setIsWidgetTapped(false);
     }
 }

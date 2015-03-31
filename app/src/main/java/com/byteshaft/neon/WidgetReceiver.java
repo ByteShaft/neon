@@ -48,12 +48,10 @@ public class WidgetReceiver extends BroadcastReceiver {
             serviceIntent.putExtra("STARTER", STARTER);
             context.startService(serviceIntent);
         } else if (FlashlightGlobals.isFlashlightOn()) {
-            remoteUi.setUiButtonsOn(false);
             FlashlightService.getInstance().stopTorch();
             sTimer.schedule(serviceTimerTask, SERVICE_SHUTDOWN_DELAY);
         } else {
             cancelServiceStopTimer();
-            remoteUi.setUiButtonsOn(true);
             FlashlightService.getInstance().lightenTorch();
         }
     }

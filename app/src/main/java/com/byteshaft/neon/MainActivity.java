@@ -94,26 +94,15 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         switch (view.getId()) {
             case R.id.switcher:
                 if (!FlashlightGlobals.isFlashlightOn()) {
-                    mRemoteUi.setUiButtonsOn(true);
                     if (!FlashlightService.isRunning()) {
+                        mRemoteUi.setUiButtonsOn(true);
                         mHelpers.startFlashlightServiceWithFlashlightOn(true);
                     } else {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                FlashlightService.getInstance().lightenTorch();
-                            }
-                        }).start();
+                        FlashlightService.getInstance().lightenTorch();
                     }
                     AppGlobals.setIsWidgetTapped(false);
                 } else {
-                    mRemoteUi.setUiButtonsOn(false);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            FlashlightService.getInstance().stopTorch();
-                        }
-                    }).start();
+                    FlashlightService.getInstance().stopTorch();
                 }
         }
     }
