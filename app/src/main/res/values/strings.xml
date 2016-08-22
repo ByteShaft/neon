@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="banner_ad_unit_id">ca-app-pub-4138623732239837/4304768107</string>
+
     <string name="main_button_description">The main toggle to turn on/off torch</string>
     <string name="app_name">Neon Torch</string>
     <string name="dialog_ok">OK</string>

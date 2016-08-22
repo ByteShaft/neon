@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "898031673742",
+    "project_id": "firebase-neon"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898031673742:android:182e3626ab6d1d64",
+        "android_client_info": {
+          "package_name": "com.byteshaft.neon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrmlgHv4Kpca2s8DJZJLjGVHBfudrXKE0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-81960997-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
