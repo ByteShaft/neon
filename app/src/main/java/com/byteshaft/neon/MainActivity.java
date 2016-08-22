@@ -22,6 +22,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.byteshaft.ezflashlight.FlashlightGlobals;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements Button.OnClickListener {
@@ -30,7 +32,6 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     private static MainActivity sActivityInstance = null;
     private Helpers mHelpers = null;
     private RemoteUpdateUiHelpers mRemoteUi = null;
-
     static MainActivity getInstance() {
         return sActivityInstance;
     }
@@ -54,6 +55,10 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         mHelpers = new Helpers(this);
         mSwitcher = (Button) findViewById(R.id.switcher);
         mSwitcher.setOnClickListener(this);
+        AdView adView = (AdView) findViewById(R.id.ad_view);
+        AdRequest adRequest = new AdRequest.Builder()
+                .setRequestAgent("android_studio:ad_template").build();
+        adView.loadAd(adRequest);
     }
 
     @Override
